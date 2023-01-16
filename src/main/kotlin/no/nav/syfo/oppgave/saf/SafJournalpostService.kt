@@ -22,6 +22,13 @@ class SafJournalpostService(
         )
 
         journalpost.data.journalpost?.let {
+            if (it.kanal != "EESSI") {
+                log.warn("Journalpost med id $journalpostId har ikke forventet mottakskanal: ${it.kanal}, $sporingsId")
+            }
+            if (it.dokumenter?.any { it.brevkode == "S055" } == false) {
+                log.warn("Journalpost med id $journalpostId har ingen dokumenter med forventet brevkode, $sporingsId")
+            }
+
             if (erIkkeJournalfort(it)) {
                 return finnDokumentInfoIdForSykmeldingPdf(it.dokumenter, sporingsId)
             } else {

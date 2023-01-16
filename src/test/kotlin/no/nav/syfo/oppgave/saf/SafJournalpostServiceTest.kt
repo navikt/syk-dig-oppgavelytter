@@ -31,10 +31,11 @@ class SafJournalpostServiceTest : FunSpec({
                 ResponseData(
                     JournalpostResponse(
                         dokumenter = listOf(
-                            Dokumenter("123", null, listOf(Dokumentvarianter("ARKIV"))),
+                            Dokumenter("123", "S055", listOf(Dokumentvarianter("ARKIV"))),
                             Dokumenter("456", null, listOf(Dokumentvarianter("ORIGINAL")))
                         ),
-                        journalstatus = "MOTTATT"
+                        journalstatus = "MOTTATT",
+                        kanal = "ESSI"
                     )
                 )
             )
@@ -48,10 +49,11 @@ class SafJournalpostServiceTest : FunSpec({
                 ResponseData(
                     JournalpostResponse(
                         dokumenter = listOf(
-                            Dokumenter("123", null, listOf(Dokumentvarianter("ARKIV"))),
+                            Dokumenter("123", "S055", listOf(Dokumentvarianter("ARKIV"))),
                             Dokumenter("456", null, listOf(Dokumentvarianter("ORIGINAL")))
                         ),
-                        journalstatus = "FERDIGSTILT"
+                        journalstatus = "FERDIGSTILT",
+                        kanal = "ESSI"
                     )
                 )
             )
@@ -68,7 +70,8 @@ class SafJournalpostServiceTest : FunSpec({
                             Dokumenter("123", null, listOf(Dokumentvarianter("SLADDET"))),
                             Dokumenter("456", null, listOf(Dokumentvarianter("ORIGINAL")))
                         ),
-                        journalstatus = "MOTTATT"
+                        journalstatus = "MOTTATT",
+                        kanal = "ESSI"
                     )
                 )
             )

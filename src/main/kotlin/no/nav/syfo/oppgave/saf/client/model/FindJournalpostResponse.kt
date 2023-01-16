@@ -10,7 +10,8 @@ data class ResponseData(
 
 data class JournalpostResponse(
     val dokumenter: List<Dokumenter>?,
-    val journalstatus: String?
+    val journalstatus: String?,
+    val kanal: String
 )
 
 data class Dokumenter(

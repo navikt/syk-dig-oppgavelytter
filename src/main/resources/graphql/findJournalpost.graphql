@@ -7,6 +7,7 @@ query FindJournalpost($id: String!) {
         variantformat
       }
     }
-    journalstatus
+    journalstatus,
+    kanal
   }
 }

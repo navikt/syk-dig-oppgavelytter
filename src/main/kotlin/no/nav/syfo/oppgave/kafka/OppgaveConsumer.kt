@@ -43,10 +43,11 @@ class OppgaveConsumer(
                 records.filter {
                     it.hendelse.hendelsestype == Hendelsestype.OPPGAVE_OPPRETTET &&
                         it.oppgave.kategorisering.tema == "SYM" && it.oppgave.kategorisering.behandlingstype == "ae0106" &&
-                        it.oppgave.kategorisering.oppgavetype == "JFR" && it.oppgave.bruker.identType == IdentType.FOLKEREGISTERIDENT
+                        it.oppgave.kategorisering.oppgavetype == "JFR" && it.oppgave.bruker != null &&
+                        it.oppgave.bruker.identType == IdentType.FOLKEREGISTERIDENT
                 }.forEach {
                         oppgaveKafkaAivenRecord ->
-                    oppgaveService.handleOppgave(oppgaveKafkaAivenRecord.oppgave.oppgaveId, oppgaveKafkaAivenRecord.oppgave.bruker.ident)
+                    oppgaveService.handleOppgave(oppgaveKafkaAivenRecord.oppgave.oppgaveId, oppgaveKafkaAivenRecord.oppgave.bruker!!.ident)
                 }
             }
         }

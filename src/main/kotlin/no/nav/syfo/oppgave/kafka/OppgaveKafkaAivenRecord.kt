@@ -9,7 +9,7 @@ data class OppgaveKafkaAivenRecord(
 
 data class Oppgave(
     val oppgaveId: Long,
-    val bruker: Bruker,
+    val bruker: Bruker?,
     val kategorisering: Kategorisering
 )
 
