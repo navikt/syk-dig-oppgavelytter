@@ -25,8 +25,8 @@ enum class IdentType {
 data class Kategorisering(
     val tema: String,
     val oppgavetype: String,
-    val behandlingstema: String,
-    val behandlingstype: String
+    val behandlingstema: String?,
+    val behandlingstype: String?
 )
 
 data class Hendelse(
