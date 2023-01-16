@@ -33,3 +33,18 @@ spec:
     requests:
       cpu: 400m
       memory: 768Mi
+  kafka:
+    pool: nav-dev
+  azure:
+    application:
+      enabled: true
+      tenant: trygdeetaten.no
+  env:
+    - name: OPPGAVE_URL
+      value: https://oppgave-q1.dev-fss-pub.nais.io/api/v1/oppgaver
+    - name: OPPGAVE_SCOPE
+      value: api://dev-fss.oppgavehandtering.oppgave-q1/.default
+    - name: SAF_URL
+      value: https://saf.dev-fss-pub.nais.io
+    - name: SAF_SCOPE
+      value: api://dev-fss.teamdokumenthandtering.saf-q1/.default
