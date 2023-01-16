@@ -95,7 +95,7 @@ fun main() {
         oppgaveService = OppgaveService(oppgaveClient, safJournalpostService),
         applicationState = applicationState
     )
-    // oppgaveConsumer.startConsumer()
+    oppgaveConsumer.startConsumer()
 
     applicationServer.start()
 }
