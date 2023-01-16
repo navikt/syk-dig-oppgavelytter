@@ -22,7 +22,7 @@ class OppgaveService(
         }
     }
 
-    fun OppgaveResponse.gjelderUtenlandskSykmeldingFraRina(): Boolean {
+    private fun OppgaveResponse.gjelderUtenlandskSykmeldingFraRina(): Boolean {
         return ferdigstiltTidspunkt == null && behandlesAvApplikasjon == null &&
             tema == "SYM" && behandlingstype == "ae0106" && behandlingstema.isNullOrEmpty() &&
             oppgavetype == "JFR" && opprettetAv == "9999" && metadata?.get("RINA_SAKID") != null

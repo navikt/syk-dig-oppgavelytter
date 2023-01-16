@@ -23,7 +23,7 @@ class SafJournalpostService(
 
         journalpost.data.journalpost?.let {
             if (erIkkeJournalfort(it)) {
-                finnDokumentInfoIdForSykmeldingPdf(it.dokumenter, sporingsId)
+                return finnDokumentInfoIdForSykmeldingPdf(it.dokumenter, sporingsId)
             } else {
                 log.warn("Journalpost med id $journalpostId er allerede journalført, sporingsId $sporingsId")
                 return null
