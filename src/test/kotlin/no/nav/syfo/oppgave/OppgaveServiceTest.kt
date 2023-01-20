@@ -31,7 +31,6 @@ class OppgaveServiceTest : FunSpec({
                 oppgavetype = "JFR",
                 behandlingstype = "ae0106",
                 versjon = 1,
-                opprettetAv = "9999",
                 metadata = mapOf("RINA_SAKID" to "111"),
                 ferdigstiltTidspunkt = null
             )
@@ -50,7 +49,6 @@ class OppgaveServiceTest : FunSpec({
                 oppgavetype = "JFR",
                 behandlingstype = "ae0106",
                 versjon = 1,
-                opprettetAv = "9999",
                 metadata = mapOf("RINA_SAKID" to "111"),
                 ferdigstiltTidspunkt = null
             )
@@ -69,7 +67,6 @@ class OppgaveServiceTest : FunSpec({
                 oppgavetype = "JFR",
                 behandlingstype = "ae0106",
                 versjon = 1,
-                opprettetAv = "9999",
                 metadata = mapOf("RINA_SAKID" to "111"),
                 ferdigstiltTidspunkt = LocalDate.now()
             )

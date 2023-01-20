@@ -30,7 +30,6 @@ data class OppgaveResponse(
     val oppgavetype: String,
     val behandlingstype: String?,
     val versjon: Int,
-    val opprettetAv: String?,
     val metadata: Map<String, String?>?,
     val ferdigstiltTidspunkt: LocalDate?
 )
