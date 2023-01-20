@@ -5,7 +5,6 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import no.nav.syfo.accesstoken.AccessTokenClient
-import java.time.LocalDateTime
 
 class OppgaveClient(
     private val url: String,
@@ -31,5 +30,5 @@ data class OppgaveResponse(
     val behandlingstype: String?,
     val versjon: Int,
     val metadata: Map<String, String?>?,
-    val ferdigstiltTidspunkt: LocalDateTime?
+    val ferdigstiltTidspunkt: String?
 )
