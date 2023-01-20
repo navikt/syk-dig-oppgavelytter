@@ -8,7 +8,7 @@ import io.mockk.mockk
 import no.nav.syfo.oppgave.client.OppgaveClient
 import no.nav.syfo.oppgave.client.OppgaveResponse
 import no.nav.syfo.oppgave.saf.SafJournalpostService
-import java.time.LocalDate
+import java.time.LocalDateTime
 
 class OppgaveServiceTest : FunSpec({
     val oppgaveClient = mockk<OppgaveClient>()
@@ -68,7 +68,7 @@ class OppgaveServiceTest : FunSpec({
                 behandlingstype = "ae0106",
                 versjon = 1,
                 metadata = mapOf("RINA_SAKID" to "111"),
-                ferdigstiltTidspunkt = LocalDate.now()
+                ferdigstiltTidspunkt = LocalDateTime.now()
             )
 
             oppgaveService.handleOppgave(1L, "fnr")
