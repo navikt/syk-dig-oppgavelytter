@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - '*'
-      - '!master'
+      - '!main'
 env:
   IMAGE: ghcr.io/${{ github.repository }}/syk-dig-oppgavelytter:${{ github.sha }}
 
