@@ -1,7 +1,7 @@
 package no.nav.syfo.oppgave.saf.client.model
 
 data class FindJournalpostResponse(
-    val data: ResponseData
+    val data: ResponseData?
 )
 
 data class ResponseData(
@@ -9,17 +9,17 @@ data class ResponseData(
 )
 
 data class JournalpostResponse(
-    val dokumenter: List<Dokumenter>?,
+    val dokumenter: List<DokumentInfo>?,
     val journalstatus: String?,
     val kanal: String
 )
 
-data class Dokumenter(
+data class DokumentInfo(
     val dokumentInfoId: String,
     val brevkode: String?,
-    val dokumentvarianter: List<Dokumentvarianter>
+    val dokumentvarianter: List<Dokumentvariant>?
 )
 
-data class Dokumentvarianter(
+data class Dokumentvariant(
     val variantformat: String
 )

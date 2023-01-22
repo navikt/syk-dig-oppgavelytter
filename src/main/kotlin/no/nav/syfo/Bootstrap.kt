@@ -61,6 +61,7 @@ fun main() {
                 }
             }
         }
+        expectSuccess = true
     }
     val httpClient = HttpClient(Apache, config)
 

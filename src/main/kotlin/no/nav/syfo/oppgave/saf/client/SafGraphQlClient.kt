@@ -26,7 +26,7 @@ class SafGraphQlClient(
                 header(HttpHeaders.ContentType, "application/json")
             }.body()
         } catch (e: Exception) {
-            log.error("Noe gikk galt ved kall til SAF, sporingsId $sporingsId", e)
+            log.error("Noe gikk galt ved kall til SAF, journalpostId $journalpostId, sporingsId $sporingsId", e)
             throw e
         }
     }

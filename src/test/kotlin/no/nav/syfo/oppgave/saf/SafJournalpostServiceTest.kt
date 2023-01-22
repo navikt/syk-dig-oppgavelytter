@@ -6,8 +6,8 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.syfo.accesstoken.AccessTokenClient
 import no.nav.syfo.oppgave.saf.client.SafGraphQlClient
-import no.nav.syfo.oppgave.saf.client.model.Dokumenter
-import no.nav.syfo.oppgave.saf.client.model.Dokumentvarianter
+import no.nav.syfo.oppgave.saf.client.model.DokumentInfo
+import no.nav.syfo.oppgave.saf.client.model.Dokumentvariant
 import no.nav.syfo.oppgave.saf.client.model.FindJournalpostResponse
 import no.nav.syfo.oppgave.saf.client.model.JournalpostResponse
 import no.nav.syfo.oppgave.saf.client.model.ResponseData
@@ -31,8 +31,8 @@ class SafJournalpostServiceTest : FunSpec({
                 ResponseData(
                     JournalpostResponse(
                         dokumenter = listOf(
-                            Dokumenter("123", "S055", listOf(Dokumentvarianter("ARKIV"))),
-                            Dokumenter("456", null, listOf(Dokumentvarianter("ORIGINAL")))
+                            DokumentInfo("123", "S055", listOf(Dokumentvariant("ARKIV"))),
+                            DokumentInfo("456", null, listOf(Dokumentvariant("ORIGINAL")))
                         ),
                         journalstatus = "MOTTATT",
                         kanal = "ESSI"
@@ -49,8 +49,8 @@ class SafJournalpostServiceTest : FunSpec({
                 ResponseData(
                     JournalpostResponse(
                         dokumenter = listOf(
-                            Dokumenter("123", "S055", listOf(Dokumentvarianter("ARKIV"))),
-                            Dokumenter("456", null, listOf(Dokumentvarianter("ORIGINAL")))
+                            DokumentInfo("123", "S055", listOf(Dokumentvariant("ARKIV"))),
+                            DokumentInfo("456", null, listOf(Dokumentvariant("ORIGINAL")))
                         ),
                         journalstatus = "FERDIGSTILT",
                         kanal = "ESSI"
@@ -67,8 +67,8 @@ class SafJournalpostServiceTest : FunSpec({
                 ResponseData(
                     JournalpostResponse(
                         dokumenter = listOf(
-                            Dokumenter("123", null, listOf(Dokumentvarianter("SLADDET"))),
-                            Dokumenter("456", null, listOf(Dokumentvarianter("ORIGINAL")))
+                            DokumentInfo("123", null, listOf(Dokumentvariant("SLADDET"))),
+                            DokumentInfo("456", null, listOf(Dokumentvariant("ORIGINAL")))
                         ),
                         journalstatus = "MOTTATT",
                         kanal = "ESSI"

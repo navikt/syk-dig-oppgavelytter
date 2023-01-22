@@ -3,7 +3,7 @@ package no.nav.syfo.oppgave.saf
 import no.nav.syfo.accesstoken.AccessTokenClient
 import no.nav.syfo.log
 import no.nav.syfo.oppgave.saf.client.SafGraphQlClient
-import no.nav.syfo.oppgave.saf.client.model.Dokumenter
+import no.nav.syfo.oppgave.saf.client.model.DokumentInfo
 import no.nav.syfo.oppgave.saf.client.model.JournalpostResponse
 
 class SafJournalpostService(
@@ -20,6 +20,10 @@ class SafJournalpostService(
             token = accessTokenClient.getAccessToken(scope),
             sporingsId = sporingsId
         )
+        if (journalpost.data == null) {
+            log.error("Mottatt journalføringsoppgave for journalpost som ikke finnes: journalpostId: $journalpostId, $sporingsId")
+            throw RuntimeException("Mottatt journalføringsoppgave for journalpost som ikke finnes")
+        }
 
         journalpost.data.journalpost?.let {
             if (it.kanal != "EESSI") {
@@ -46,9 +50,9 @@ class SafJournalpostService(
         } ?: false
     }
 
-    private fun finnDokumentInfoIdForSykmeldingPdf(dokumentListe: List<Dokumenter>?, sporingsId: String): String {
+    private fun finnDokumentInfoIdForSykmeldingPdf(dokumentListe: List<DokumentInfo>?, sporingsId: String): String {
         dokumentListe?.forEach { dokument ->
-            dokument.dokumentvarianter.forEach {
+            dokument.dokumentvarianter?.forEach {
                 if (it.variantformat == "ARKIV") {
                     return dokument.dokumentInfoId
                 }
