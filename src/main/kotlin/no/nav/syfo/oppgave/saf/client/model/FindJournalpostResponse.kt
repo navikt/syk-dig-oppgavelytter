@@ -1,7 +1,8 @@
 package no.nav.syfo.oppgave.saf.client.model
 
 data class FindJournalpostResponse(
-    val data: ResponseData?
+    val data: ResponseData?,
+    val errors: List<Error>?
 )
 
 data class ResponseData(
@@ -22,4 +23,8 @@ data class DokumentInfo(
 
 data class Dokumentvariant(
     val variantformat: String
+)
+
+data class Error(
+    val message: String?
 )

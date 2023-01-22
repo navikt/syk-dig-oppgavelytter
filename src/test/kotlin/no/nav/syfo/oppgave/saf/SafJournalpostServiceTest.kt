@@ -37,7 +37,8 @@ class SafJournalpostServiceTest : FunSpec({
                         journalstatus = "MOTTATT",
                         kanal = "ESSI"
                     )
-                )
+                ),
+                emptyList()
             )
 
             val dokumentInfoId = safJournalpostService.getDokumentInfoId("jpId", "sporing")
@@ -55,7 +56,8 @@ class SafJournalpostServiceTest : FunSpec({
                         journalstatus = "FERDIGSTILT",
                         kanal = "ESSI"
                     )
-                )
+                ),
+                emptyList()
             )
 
             val dokumentInfoId = safJournalpostService.getDokumentInfoId("jpId", "sporing")
@@ -73,7 +75,8 @@ class SafJournalpostServiceTest : FunSpec({
                         journalstatus = "MOTTATT",
                         kanal = "ESSI"
                     )
-                )
+                ),
+                emptyList()
             )
 
             assertFailsWith<RuntimeException> {

@@ -20,6 +20,9 @@ class SafJournalpostService(
             token = accessTokenClient.getAccessToken(scope),
             sporingsId = sporingsId
         )
+        journalpost.errors?.forEach {
+            log.error("Feil ved henting av journalpost med id $journalpostId fra SAF: ${it.message}")
+        }
         if (journalpost.data == null) {
             log.error("Mottatt journalføringsoppgave for journalpost som ikke finnes: journalpostId: $journalpostId, $sporingsId")
             throw RuntimeException("Mottatt journalføringsoppgave for journalpost som ikke finnes")
