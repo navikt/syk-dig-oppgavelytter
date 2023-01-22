@@ -14,7 +14,7 @@ class OppgaveService(
         val sporingsId = UUID.randomUUID().toString()
         val oppgave = oppgaveClient.hentOppgave(oppgaveId = oppgaveId, sporingsId = sporingsId)
 
-        if (oppgave.gjelderUtenlandskSykmeldingFraRina() && oppgave.journalpostId != null) {
+        if (oppgave.gjelderUtenlandskSykmeldingFraRina() && !oppgave.journalpostId.isNullOrEmpty()) {
             log.info("Oppgave med id $oppgaveId  og journalpostId ${oppgave.journalpostId} gjelder utenlandsk sykmelding fra Rina, sporingsId $sporingsId")
             val dokumentInfoId = safJournalpostService.getDokumentInfoId(journalpostId = oppgave.journalpostId, sporingsId = sporingsId)
 
