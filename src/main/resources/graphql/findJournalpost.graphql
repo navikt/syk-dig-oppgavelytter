@@ -1,5 +1,5 @@
-query FindJournalpost($id: String!) {
-  journalpost(journalpostId: $id) {
+query FindJournalpost(journalpostId: String!) {
+  journalpost(journalpostId: journalpostId) {
     dokumenter {
       dokumentInfoId
       brevkode
