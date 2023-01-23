@@ -19,15 +19,20 @@ import no.nav.syfo.application.createApplicationEngine
 import no.nav.syfo.application.exception.ServiceUnavailableException
 import no.nav.syfo.kafka.aiven.KafkaUtils
 import no.nav.syfo.kafka.toConsumerConfig
+import no.nav.syfo.kafka.toProducerConfig
 import no.nav.syfo.oppgave.OppgaveService
 import no.nav.syfo.oppgave.client.OppgaveClient
 import no.nav.syfo.oppgave.kafka.OppgaveConsumer
 import no.nav.syfo.oppgave.kafka.OppgaveKafkaAivenRecord
 import no.nav.syfo.oppgave.saf.SafJournalpostService
 import no.nav.syfo.oppgave.saf.client.SafGraphQlClient
+import no.nav.syfo.oppgave.sykdig.DigitaliseringsoppgaveKafka
+import no.nav.syfo.oppgave.sykdig.SykDigProducer
 import no.nav.syfo.util.kafka.JacksonKafkaDeserializer
+import no.nav.syfo.util.kafka.JacksonKafkaSerializer
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -90,10 +95,18 @@ fun main() {
         scope = env.safScope
     )
 
+    val sykDigProducer = SykDigProducer(
+        KafkaProducer<String, DigitaliseringsoppgaveKafka>(
+            KafkaUtils.getAivenKafkaConfig()
+                .toProducerConfig(env.applicationName, valueSerializer = JacksonKafkaSerializer::class)
+        ),
+        env.sykDigTopic
+    )
+
     val oppgaveConsumer = OppgaveConsumer(
         oppgaveTopic = env.oppgaveTopic,
         kafkaConsumer = getKafkaConsumer(),
-        oppgaveService = OppgaveService(oppgaveClient, safJournalpostService),
+        oppgaveService = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, env.cluster),
         applicationState = applicationState
     )
     oppgaveConsumer.startConsumer()

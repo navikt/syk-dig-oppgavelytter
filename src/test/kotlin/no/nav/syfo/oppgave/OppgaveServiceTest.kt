@@ -1,23 +1,28 @@
 package no.nav.syfo.oppgave
 
 import io.kotest.core.spec.style.FunSpec
+import io.mockk.Runs
 import io.mockk.clearMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.just
 import io.mockk.mockk
 import no.nav.syfo.oppgave.client.OppgaveClient
 import no.nav.syfo.oppgave.client.OppgaveResponse
 import no.nav.syfo.oppgave.saf.SafJournalpostService
+import no.nav.syfo.oppgave.sykdig.SykDigProducer
 
 class OppgaveServiceTest : FunSpec({
     val oppgaveClient = mockk<OppgaveClient>()
     val safJournalpostService = mockk<SafJournalpostService>()
+    val sykDigProducer = mockk<SykDigProducer>()
 
-    val oppgaveService = OppgaveService(oppgaveClient, safJournalpostService)
+    val oppgaveService = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, "dev-gcp")
 
     beforeEach {
         clearMocks(oppgaveClient, safJournalpostService)
         coEvery { safJournalpostService.getDokumentInfoId(any(), any()) } returns "123"
+        coEvery { sykDigProducer.send(any(), any()) } just Runs
     }
 
     context("OppgaveService") {
@@ -37,6 +42,15 @@ class OppgaveServiceTest : FunSpec({
             oppgaveService.handleOppgave(1L, "fnr")
 
             coVerify { safJournalpostService.getDokumentInfoId("5566", any()) }
+            coVerify {
+                sykDigProducer.send(
+                    any(),
+                    match {
+                        it.oppgaveId == "1" && it.journalpostId == "5566" &&
+                            it.fnr == "fnr" && it.dokumentInfoId == "123" && it.type == "UTLAND"
+                    }
+                )
+            }
         }
 
         test("Henter ikke dokumentInfoId for utenlandsk sykmelding-oppgave med behandlesAvApplikasjon SMD") {
