@@ -20,7 +20,7 @@ class OppgaveServiceTest : FunSpec({
     val oppgaveService = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, "dev-gcp")
 
     beforeEach {
-        clearMocks(oppgaveClient, safJournalpostService)
+        clearMocks(oppgaveClient, safJournalpostService, sykDigProducer)
         coEvery { safJournalpostService.getDokumentInfoId(any(), any()) } returns "123"
         coEvery { sykDigProducer.send(any(), any()) } just Runs
     }
@@ -89,6 +89,27 @@ class OppgaveServiceTest : FunSpec({
             oppgaveService.handleOppgave(1L, "fnr")
 
             coVerify(exactly = 0) { safJournalpostService.getDokumentInfoId(any(), any()) }
+        }
+
+        test("Sender ikke sykmelding til syk-dig i prod-gcp") {
+            val oppgavesServiceProd = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, "prod-gcp")
+            coEvery { oppgaveClient.hentOppgave(any(), any()) } returns OppgaveResponse(
+                journalpostId = "5566",
+                behandlesAvApplikasjon = null,
+                tema = "SYM",
+                behandlingstema = null,
+                oppgavetype = "JFR",
+                behandlingstype = "ae0106",
+                versjon = 1,
+                metadata = mapOf("RINA_SAKID" to "111"),
+                ferdigstiltTidspunkt = null
+            )
+
+            oppgavesServiceProd.handleOppgave(1L, "fnr")
+
+            coVerify { safJournalpostService.getDokumentInfoId("5566", any()) }
+            coVerify(exactly = 0) { oppgaveClient.oppdaterOppgave(any(), any()) }
+            coVerify(exactly = 0) { sykDigProducer.send(any(), any()) }
         }
     }
 })

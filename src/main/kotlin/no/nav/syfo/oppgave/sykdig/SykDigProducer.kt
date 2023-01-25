@@ -13,7 +13,7 @@ class SykDigProducer(
             kafkaProducer.send(
                 ProducerRecord(
                     topicName,
-                    digitaliseringsoppgave.oppgaveId,
+                    sporingsId,
                     digitaliseringsoppgave
                 )
             ).get()
