@@ -1,6 +1,7 @@
 package no.nav.syfo.oppgave
 
 import no.nav.syfo.log
+import no.nav.syfo.oppgave.client.OppdaterOppgaveRequest
 import no.nav.syfo.oppgave.client.OppgaveClient
 import no.nav.syfo.oppgave.client.OppgaveResponse
 import no.nav.syfo.oppgave.saf.SafJournalpostService
@@ -25,6 +26,14 @@ class OppgaveService(
             log.info("Utenlandsk sykmelding fra Rina: OppgaveId $oppgaveId, journalpostId ${oppgave.journalpostId}, dokumentInfoId $dokumentInfoId")
 
             if (cluster == "dev-gcp" && dokumentInfoId != null) {
+                oppgaveClient.oppdaterOppgave(
+                    OppdaterOppgaveRequest(
+                        id = oppgaveId.toInt(),
+                        behandlesAvApplikasjon = "SMD",
+                        versjon = oppgave.versjon
+                    ),
+                    sporingsId
+                )
                 sykDigProducer.send(
                     sporingsId,
                     DigitaliseringsoppgaveKafka(

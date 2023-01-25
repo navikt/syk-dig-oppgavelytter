@@ -38,10 +38,12 @@ class OppgaveServiceTest : FunSpec({
                 metadata = mapOf("RINA_SAKID" to "111"),
                 ferdigstiltTidspunkt = null
             )
+            coEvery { oppgaveClient.oppdaterOppgave(any(), any()) } just Runs
 
             oppgaveService.handleOppgave(1L, "fnr")
 
             coVerify { safJournalpostService.getDokumentInfoId("5566", any()) }
+            coVerify { oppgaveClient.oppdaterOppgave(match { it.id == 1 && it.versjon == 1 && it.behandlesAvApplikasjon == "SMD" }, any()) }
             coVerify {
                 sykDigProducer.send(
                     any(),
