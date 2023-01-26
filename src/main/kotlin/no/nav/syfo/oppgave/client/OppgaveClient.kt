@@ -4,6 +4,12 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.request.patch
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import no.nav.syfo.accesstoken.AccessTokenClient
 import no.nav.syfo.log
 
@@ -25,6 +31,20 @@ class OppgaveClient(
             throw e
         }
     }
+
+    suspend fun oppdaterOppgave(oppdaterOppgaveRequest: OppdaterOppgaveRequest, sporingsId: String) {
+        val httpResponse: HttpResponse = httpClient.patch("$url/${oppdaterOppgaveRequest.id}") {
+            contentType(ContentType.Application.Json)
+            val token = accessTokenClient.getAccessToken(scope)
+            header("Authorization", "Bearer $token")
+            header("X-Correlation-ID", sporingsId)
+            setBody(oppdaterOppgaveRequest)
+        }
+        if (httpResponse.status != HttpStatusCode.OK) {
+            log.error("Noe gikk galt ved oppdatering av oppgave for sporingsId $sporingsId: ${httpResponse.status}, ${httpResponse.body<String>()}")
+            throw RuntimeException("Noe gikk galt ved oppdatering av oppgave, responskode ${httpResponse.status}")
+        }
+    }
 }
 
 data class OppgaveResponse(
@@ -37,4 +57,10 @@ data class OppgaveResponse(
     val versjon: Int,
     val metadata: Map<String, String?>?,
     val ferdigstiltTidspunkt: String?
+)
+
+data class OppdaterOppgaveRequest(
+    val id: Int,
+    val versjon: Int,
+    val behandlesAvApplikasjon: String
 )

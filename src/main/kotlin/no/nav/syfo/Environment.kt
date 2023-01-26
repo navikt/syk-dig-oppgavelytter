@@ -10,7 +10,9 @@ data class Environment(
     val oppgaveUrl: String = getEnvVar("OPPGAVE_URL"),
     val oppgaveScope: String = getEnvVar("OPPGAVE_SCOPE"),
     val safUrl: String = getEnvVar("SAF_URL"),
-    val safScope: String = getEnvVar("SAF_SCOPE")
+    val safScope: String = getEnvVar("SAF_SCOPE"),
+    val sykDigTopic: String = "teamsykmelding.syk-dig-oppgave",
+    val cluster: String = getEnvVar("NAIS_CLUSTER_NAME")
 )
 
 fun getEnvVar(varName: String, defaultValue: String? = null) =
