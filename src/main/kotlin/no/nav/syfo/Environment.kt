@@ -3,7 +3,7 @@ package no.nav.syfo
 data class Environment(
     val applicationPort: Int = getEnvVar("APPLICATION_PORT", "8080").toInt(),
     val applicationName: String = getEnvVar("NAIS_APP_NAME", "syk-dig-oppgavelytter"),
-    val oppgaveTopic: String = "oppgavehandtering.oppgavehendelse-v1",
+    val oppgaveTopic: String = getEnvVar("OPPGAVE_TOPIC"),
     val aadAccessTokenUrl: String = getEnvVar("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"),
     val clientId: String = getEnvVar("AZURE_APP_CLIENT_ID"),
     val clientSecret: String = getEnvVar("AZURE_APP_CLIENT_SECRET"),
