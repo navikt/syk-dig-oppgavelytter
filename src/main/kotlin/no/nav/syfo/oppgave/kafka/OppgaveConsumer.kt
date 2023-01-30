@@ -27,7 +27,6 @@ class OppgaveConsumer(
                     consume()
                 } catch (ex: Exception) {
                     log.error("error running oppgave-consumer", ex)
-                } finally {
                     kafkaConsumer.unsubscribe()
                     log.info("Unsubscribed from topic $oppgaveTopic and waiting for 10 seconds before trying again")
                     delay(10_000)
