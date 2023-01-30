@@ -40,6 +40,7 @@ class OppgaveConsumer(
             val records = kafkaConsumer.poll(Duration.ofSeconds(1)).mapNotNull { it.value() }
             if (records.isNotEmpty()) {
                 log.info("Lest ${records.size} elementer")
+                records.forEach { log.info("OppgaveId: ${it.oppgave.oppgaveId}") }
                 records.filter {
                     it.hendelse.hendelsestype == Hendelsestype.OPPGAVE_OPPRETTET &&
                         it.oppgave.kategorisering.tema == "SYM" && it.oppgave.kategorisering.behandlingstype == "ae0106" &&
