@@ -48,3 +48,5 @@ spec:
       value: https://saf.dev-fss-pub.nais.io
     - name: SAF_SCOPE
       value: api://dev-fss.teamdokumenthandtering.saf-q1/.default
+    - name: OPPGAVE_TOPIC
+      value: oppgavehandtering.oppgavehendelse-q1-v1
