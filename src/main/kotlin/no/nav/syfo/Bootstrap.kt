@@ -87,7 +87,7 @@ fun main() {
     val safGraphQlClient = SafGraphQlClient(
         httpClient = httpClient,
         basePath = "${env.safUrl}/graphql",
-        graphQlQuery = SafGraphQlClient::class.java.getResource("/graphql/findJournalpost.graphql").readText().replace(Regex("[\n\t]"), "")
+        graphQlQuery = SafGraphQlClient::class.java.getResource("/graphql/findJournalpost.graphql")!!.readText().replace(Regex("[\n\t]"), "")
     )
     val safJournalpostService = SafJournalpostService(
         safGraphQlClient = safGraphQlClient,
