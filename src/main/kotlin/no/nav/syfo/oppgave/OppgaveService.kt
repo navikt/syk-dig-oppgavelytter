@@ -40,7 +40,7 @@ class OppgaveService(
                         oppgaveId = oppgaveId.toString(),
                         fnr = fnr,
                         journalpostId = oppgave.journalpostId,
-                        dokumentInfoId = dokumenter.first(),
+                        dokumentInfoId = dokumenter.first().dokumentInfoId,
                         type = "UTLAND",
                         dokumenter = dokumenter
                     )

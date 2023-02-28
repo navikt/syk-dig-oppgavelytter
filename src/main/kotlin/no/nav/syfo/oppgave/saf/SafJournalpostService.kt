@@ -5,6 +5,7 @@ import no.nav.syfo.log
 import no.nav.syfo.oppgave.saf.client.SafGraphQlClient
 import no.nav.syfo.oppgave.saf.client.model.DokumentInfo
 import no.nav.syfo.oppgave.saf.client.model.JournalpostResponse
+import no.nav.syfo.oppgave.saf.model.DokumentMedTittel
 
 class SafJournalpostService(
     private val safGraphQlClient: SafGraphQlClient,
@@ -14,7 +15,7 @@ class SafJournalpostService(
     suspend fun getDokumenter(
         journalpostId: String,
         sporingsId: String
-    ): List<String>? {
+    ): List<DokumentMedTittel>? {
         val journalpost = safGraphQlClient.findJournalpost(
             journalpostId = journalpostId,
             token = accessTokenClient.getAccessToken(scope),
@@ -56,12 +57,12 @@ class SafJournalpostService(
     private fun finnDokumentInfoIdForSykmeldingPdfListe(
         dokumentListe: List<DokumentInfo>?,
         sporingsId: String
-    ): List<String> {
+    ): List<DokumentMedTittel> {
         val dokumenter = dokumentListe?.filter { dokument ->
             dokument.dokumentvarianter?.any {
                 it.variantformat == "ARKIV"
             } == true
-        }?.map { it.dokumentInfoId }
+        }?.map { DokumentMedTittel(it.dokumentInfoId, it.tittel) }
 
         if (dokumenter.isNullOrEmpty()) {
             log.error("Fant ikke PDF-dokument for sykmelding, $sporingsId")

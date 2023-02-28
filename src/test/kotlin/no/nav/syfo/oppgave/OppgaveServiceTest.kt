@@ -10,6 +10,7 @@ import io.mockk.mockk
 import no.nav.syfo.oppgave.client.OppgaveClient
 import no.nav.syfo.oppgave.client.OppgaveResponse
 import no.nav.syfo.oppgave.saf.SafJournalpostService
+import no.nav.syfo.oppgave.saf.model.DokumentMedTittel
 import no.nav.syfo.oppgave.sykdig.SykDigProducer
 
 class OppgaveServiceTest : FunSpec({
@@ -21,7 +22,10 @@ class OppgaveServiceTest : FunSpec({
 
     beforeEach {
         clearMocks(oppgaveClient, safJournalpostService, sykDigProducer)
-        coEvery { safJournalpostService.getDokumenter(any(), any()) } returns listOf("123", "456")
+        coEvery { safJournalpostService.getDokumenter(any(), any()) } returns listOf(
+            DokumentMedTittel("123", "123dokument"),
+            DokumentMedTittel("456", "456dokument")
+        )
         coEvery { sykDigProducer.send(any(), any()) } just Runs
     }
 
@@ -49,7 +53,10 @@ class OppgaveServiceTest : FunSpec({
                     any(),
                     match {
                         it.oppgaveId == "1" && it.journalpostId == "5566" &&
-                            it.fnr == "fnr" && it.dokumentInfoId == "123" && it.type == "UTLAND" && it.dokumenter == listOf("123", "456")
+                            it.fnr == "fnr" && it.dokumentInfoId == "123" && it.type == "UTLAND" && it.dokumenter == listOf(
+                            DokumentMedTittel("123", "123dokument"),
+                            DokumentMedTittel("456", "456dokument")
+                        )
                     }
                 )
             }

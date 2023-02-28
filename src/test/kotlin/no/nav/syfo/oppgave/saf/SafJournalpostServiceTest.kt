@@ -11,6 +11,7 @@ import no.nav.syfo.oppgave.saf.client.model.Dokumentvariant
 import no.nav.syfo.oppgave.saf.client.model.FindJournalpostResponse
 import no.nav.syfo.oppgave.saf.client.model.JournalpostResponse
 import no.nav.syfo.oppgave.saf.client.model.ResponseData
+import no.nav.syfo.oppgave.saf.model.DokumentMedTittel
 import org.amshove.kluent.internal.assertFailsWith
 import org.amshove.kluent.shouldBeEqualTo
 
@@ -31,8 +32,8 @@ class SafJournalpostServiceTest : FunSpec({
                 ResponseData(
                     JournalpostResponse(
                         dokumenter = listOf(
-                            DokumentInfo("123", "S055", listOf(Dokumentvariant("ARKIV"))),
-                            DokumentInfo("456", null, listOf(Dokumentvariant("ORIGINAL")))
+                            DokumentInfo("123", "tittel", "S055", listOf(Dokumentvariant("ARKIV"))),
+                            DokumentInfo("456", "tittel", null, listOf(Dokumentvariant("ORIGINAL")))
                         ),
                         journalstatus = "MOTTATT",
                         kanal = "ESSI"
@@ -43,15 +44,15 @@ class SafJournalpostServiceTest : FunSpec({
 
             val dokumentInfoId = safJournalpostService.getDokumenter("jpId", "sporing")
 
-            dokumentInfoId shouldBeEqualTo listOf("123")
+            dokumentInfoId shouldBeEqualTo listOf(DokumentMedTittel("123", "tittel"))
         }
         test("Returnerer null hvis journalposten er journalført allerede") {
             coEvery { safGraphQlClient.findJournalpost(any(), any(), any()) } returns FindJournalpostResponse(
                 ResponseData(
                     JournalpostResponse(
                         dokumenter = listOf(
-                            DokumentInfo("123", "S055", listOf(Dokumentvariant("ARKIV"))),
-                            DokumentInfo("456", null, listOf(Dokumentvariant("ORIGINAL")))
+                            DokumentInfo("123", "tittel", "S055", listOf(Dokumentvariant("ARKIV"))),
+                            DokumentInfo("456", "tittel", null, listOf(Dokumentvariant("ORIGINAL")))
                         ),
                         journalstatus = "FERDIGSTILT",
                         kanal = "ESSI"
@@ -69,8 +70,8 @@ class SafJournalpostServiceTest : FunSpec({
                 ResponseData(
                     JournalpostResponse(
                         dokumenter = listOf(
-                            DokumentInfo("123", null, listOf(Dokumentvariant("SLADDET"))),
-                            DokumentInfo("456", null, listOf(Dokumentvariant("ORIGINAL")))
+                            DokumentInfo("123", "tittel", "S055", listOf(Dokumentvariant("SLADDET"))),
+                            DokumentInfo("456", "tittel", null, listOf(Dokumentvariant("ORIGINAL")))
                         ),
                         journalstatus = "MOTTATT",
                         kanal = "ESSI"
