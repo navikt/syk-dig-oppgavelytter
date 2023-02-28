@@ -21,11 +21,11 @@ class OppgaveService(
 
         if (oppgave.gjelderUtenlandskSykmeldingFraRina() && !oppgave.journalpostId.isNullOrEmpty()) {
             log.info("Oppgave med id $oppgaveId  og journalpostId ${oppgave.journalpostId} gjelder utenlandsk sykmelding fra Rina, sporingsId $sporingsId")
-            val dokumentInfoId = safJournalpostService.getDokumentInfoId(journalpostId = oppgave.journalpostId, sporingsId = sporingsId)
+            val dokumenter = safJournalpostService.getDokumenter(journalpostId = oppgave.journalpostId, sporingsId = sporingsId)
 
-            log.info("Utenlandsk sykmelding fra Rina: OppgaveId $oppgaveId, journalpostId ${oppgave.journalpostId}, dokumentInfoId $dokumentInfoId")
+            log.info("Utenlandsk sykmelding fra Rina: OppgaveId $oppgaveId, journalpostId ${oppgave.journalpostId}, dokumenter $dokumenter")
 
-            if (cluster == "dev-gcp" && dokumentInfoId != null) {
+            if (cluster == "dev-gcp" && dokumenter != null) {
                 oppgaveClient.oppdaterOppgave(
                     OppdaterOppgaveRequest(
                         id = oppgaveId.toInt(),
@@ -40,8 +40,9 @@ class OppgaveService(
                         oppgaveId = oppgaveId.toString(),
                         fnr = fnr,
                         journalpostId = oppgave.journalpostId,
-                        dokumentInfoId = dokumentInfoId,
-                        type = "UTLAND"
+                        dokumentInfoId = dokumenter.first(),
+                        type = "UTLAND",
+                        dokumenter = dokumenter
                     )
                 )
                 log.info("Sendt sykmelding til syk-dig for oppgaveId $oppgaveId, sporingsId $sporingsId")

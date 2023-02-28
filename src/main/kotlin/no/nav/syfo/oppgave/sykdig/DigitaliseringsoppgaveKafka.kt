@@ -5,5 +5,6 @@ data class DigitaliseringsoppgaveKafka(
     val fnr: String,
     val journalpostId: String,
     val dokumentInfoId: String,
-    val type: String
+    val type: String,
+    val dokumenter: List<String>
 )

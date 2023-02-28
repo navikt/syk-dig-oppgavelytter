@@ -41,9 +41,9 @@ class SafJournalpostServiceTest : FunSpec({
                 emptyList()
             )
 
-            val dokumentInfoId = safJournalpostService.getDokumentInfoId("jpId", "sporing")
+            val dokumentInfoId = safJournalpostService.getDokumenter("jpId", "sporing")
 
-            dokumentInfoId shouldBeEqualTo "123"
+            dokumentInfoId shouldBeEqualTo listOf("123")
         }
         test("Returnerer null hvis journalposten er journalført allerede") {
             coEvery { safGraphQlClient.findJournalpost(any(), any(), any()) } returns FindJournalpostResponse(
@@ -60,7 +60,7 @@ class SafJournalpostServiceTest : FunSpec({
                 emptyList()
             )
 
-            val dokumentInfoId = safJournalpostService.getDokumentInfoId("jpId", "sporing")
+            val dokumentInfoId = safJournalpostService.getDokumenter("jpId", "sporing")
 
             dokumentInfoId shouldBeEqualTo null
         }
@@ -80,7 +80,7 @@ class SafJournalpostServiceTest : FunSpec({
             )
 
             assertFailsWith<RuntimeException> {
-                safJournalpostService.getDokumentInfoId("jpId", "sporing")
+                safJournalpostService.getDokumenter("jpId", "sporing")
             }
         }
     }

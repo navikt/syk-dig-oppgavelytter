@@ -21,7 +21,7 @@ class OppgaveServiceTest : FunSpec({
 
     beforeEach {
         clearMocks(oppgaveClient, safJournalpostService, sykDigProducer)
-        coEvery { safJournalpostService.getDokumentInfoId(any(), any()) } returns "123"
+        coEvery { safJournalpostService.getDokumenter(any(), any()) } returns listOf("123", "456")
         coEvery { sykDigProducer.send(any(), any()) } just Runs
     }
 
@@ -42,14 +42,14 @@ class OppgaveServiceTest : FunSpec({
 
             oppgaveService.handleOppgave(1L, "fnr")
 
-            coVerify { safJournalpostService.getDokumentInfoId("5566", any()) }
+            coVerify { safJournalpostService.getDokumenter("5566", any()) }
             coVerify { oppgaveClient.oppdaterOppgave(match { it.id == 1 && it.versjon == 1 && it.behandlesAvApplikasjon == "SMD" }, any()) }
             coVerify {
                 sykDigProducer.send(
                     any(),
                     match {
                         it.oppgaveId == "1" && it.journalpostId == "5566" &&
-                            it.fnr == "fnr" && it.dokumentInfoId == "123" && it.type == "UTLAND"
+                            it.fnr == "fnr" && it.dokumentInfoId == "123" && it.type == "UTLAND" && it.dokumenter == listOf("123", "456")
                     }
                 )
             }
@@ -70,7 +70,7 @@ class OppgaveServiceTest : FunSpec({
 
             oppgaveService.handleOppgave(1L, "fnr")
 
-            coVerify(exactly = 0) { safJournalpostService.getDokumentInfoId(any(), any()) }
+            coVerify(exactly = 0) { safJournalpostService.getDokumenter(any(), any()) }
         }
 
         test("Henter ikke dokumentInfoId for ferdigstilt utenlandsk sykmelding-oppgave som kommer fra Rina") {
@@ -88,7 +88,7 @@ class OppgaveServiceTest : FunSpec({
 
             oppgaveService.handleOppgave(1L, "fnr")
 
-            coVerify(exactly = 0) { safJournalpostService.getDokumentInfoId(any(), any()) }
+            coVerify(exactly = 0) { safJournalpostService.getDokumenter(any(), any()) }
         }
 
         test("Sender ikke sykmelding til syk-dig i prod-gcp") {
@@ -107,7 +107,7 @@ class OppgaveServiceTest : FunSpec({
 
             oppgavesServiceProd.handleOppgave(1L, "fnr")
 
-            coVerify { safJournalpostService.getDokumentInfoId("5566", any()) }
+            coVerify { safJournalpostService.getDokumenter("5566", any()) }
             coVerify(exactly = 0) { oppgaveClient.oppdaterOppgave(any(), any()) }
             coVerify(exactly = 0) { sykDigProducer.send(any(), any()) }
         }
