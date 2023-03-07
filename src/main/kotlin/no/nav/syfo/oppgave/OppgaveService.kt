@@ -9,6 +9,8 @@ import no.nav.syfo.oppgave.sykdig.DigitaliseringsoppgaveKafka
 import no.nav.syfo.oppgave.sykdig.SykDigProducer
 import java.util.UUID
 
+const val NAV_OPPFOLGNING_UTLAND = "0393"
+
 class OppgaveService(
     private val oppgaveClient: OppgaveClient,
     private val safJournalpostService: SafJournalpostService,
@@ -24,28 +26,33 @@ class OppgaveService(
             val dokumenter = safJournalpostService.getDokumenter(journalpostId = oppgave.journalpostId, sporingsId = sporingsId)
 
             log.info("Utenlandsk sykmelding fra Rina: OppgaveId $oppgaveId, journalpostId ${oppgave.journalpostId}, dokumenter $dokumenter")
-
-            if (cluster == "dev-gcp" && dokumenter != null) {
-                oppgaveClient.oppdaterOppgave(
-                    OppdaterOppgaveRequest(
-                        id = oppgaveId.toInt(),
-                        behandlesAvApplikasjon = "SMD",
-                        versjon = oppgave.versjon
-                    ),
-                    sporingsId
-                )
-                sykDigProducer.send(
-                    sporingsId,
-                    DigitaliseringsoppgaveKafka(
-                        oppgaveId = oppgaveId.toString(),
-                        fnr = fnr,
-                        journalpostId = oppgave.journalpostId,
-                        dokumentInfoId = dokumenter.first().dokumentInfoId,
-                        type = "UTLAND",
-                        dokumenter = dokumenter
+            if (oppgave.erTildeltNavOppfolgningUtlang()) {
+                if (dokumenter != null) {
+                    oppgaveClient.oppdaterOppgave(
+                        OppdaterOppgaveRequest(
+                            id = oppgaveId.toInt(),
+                            behandlesAvApplikasjon = "SMD",
+                            versjon = oppgave.versjon
+                        ),
+                        sporingsId
                     )
-                )
-                log.info("Sendt sykmelding til syk-dig for oppgaveId $oppgaveId, sporingsId $sporingsId")
+                    sykDigProducer.send(
+                        sporingsId,
+                        DigitaliseringsoppgaveKafka(
+                            oppgaveId = oppgaveId.toString(),
+                            fnr = fnr,
+                            journalpostId = oppgave.journalpostId,
+                            dokumentInfoId = dokumenter.first().dokumentInfoId,
+                            type = "UTLAND",
+                            dokumenter = dokumenter
+                        )
+                    )
+                    log.info("Sendt sykmelding til syk-dig for oppgaveId $oppgaveId, sporingsId $sporingsId")
+                } else {
+                    log.warn("Oppgaven $oppgaveId har ikke dokumenter, hopper over")
+                }
+            } else {
+                log.warn("Oppgaven $oppgaveId er ikke tildelt $NAV_OPPFOLGNING_UTLAND")
             }
         }
     }
@@ -55,4 +62,6 @@ class OppgaveService(
             tema == "SYM" && behandlingstype == "ae0106" && behandlingstema.isNullOrEmpty() &&
             oppgavetype == "JFR" && metadata?.get("RINA_SAKID") != null
     }
+
+    private fun OppgaveResponse.erTildeltNavOppfolgningUtlang() = tildeltEnhetsnr == NAV_OPPFOLGNING_UTLAND
 }

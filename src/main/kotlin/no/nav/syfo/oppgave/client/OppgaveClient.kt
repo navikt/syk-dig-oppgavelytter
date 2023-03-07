@@ -56,7 +56,8 @@ data class OppgaveResponse(
     val behandlingstype: String?,
     val versjon: Int,
     val metadata: Map<String, String?>?,
-    val ferdigstiltTidspunkt: String?
+    val ferdigstiltTidspunkt: String?,
+    val tildeltEnhetsnr: String
 )
 
 data class OppdaterOppgaveRequest(
