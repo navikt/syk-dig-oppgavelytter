@@ -5,16 +5,17 @@ import no.nav.syfo.log
 import no.nav.syfo.oppgave.saf.client.SafGraphQlClient
 import no.nav.syfo.oppgave.saf.client.model.DokumentInfo
 import no.nav.syfo.oppgave.saf.client.model.JournalpostResponse
+import no.nav.syfo.oppgave.saf.model.DokumentMedTittel
 
 class SafJournalpostService(
     private val safGraphQlClient: SafGraphQlClient,
     private val accessTokenClient: AccessTokenClient,
     private val scope: String
 ) {
-    suspend fun getDokumentInfoId(
+    suspend fun getDokumenter(
         journalpostId: String,
         sporingsId: String
-    ): String? {
+    ): List<DokumentMedTittel>? {
         val journalpost = safGraphQlClient.findJournalpost(
             journalpostId = journalpostId,
             token = accessTokenClient.getAccessToken(scope),
@@ -37,7 +38,7 @@ class SafJournalpostService(
             }
 
             if (erIkkeJournalfort(it)) {
-                return finnDokumentInfoIdForSykmeldingPdf(it.dokumenter, sporingsId)
+                return finnDokumentInfoIdForSykmeldingPdfListe(it.dokumenter, sporingsId)
             } else {
                 log.warn("Journalpost med id $journalpostId er allerede journalført, sporingsId $sporingsId")
                 return null
@@ -53,15 +54,21 @@ class SafJournalpostService(
         } ?: false
     }
 
-    private fun finnDokumentInfoIdForSykmeldingPdf(dokumentListe: List<DokumentInfo>?, sporingsId: String): String {
-        dokumentListe?.forEach { dokument ->
-            dokument.dokumentvarianter?.forEach {
-                if (it.variantformat == "ARKIV") {
-                    return dokument.dokumentInfoId
-                }
-            }
+    private fun finnDokumentInfoIdForSykmeldingPdfListe(
+        dokumentListe: List<DokumentInfo>?,
+        sporingsId: String
+    ): List<DokumentMedTittel> {
+        val dokumenter = dokumentListe?.filter { dokument ->
+            dokument.dokumentvarianter?.any {
+                it.variantformat == "ARKIV"
+            } == true
+        }?.map { DokumentMedTittel(it.dokumentInfoId, it.tittel) }
+
+        if (dokumenter.isNullOrEmpty()) {
+            log.error("Fant ikke PDF-dokument for sykmelding, $sporingsId")
+            throw RuntimeException("Journalpost mangler PDF, $sporingsId")
         }
-        log.error("Fant ikke PDF-dokument for sykmelding, $sporingsId")
-        throw RuntimeException("Journalpost mangler PDF, $sporingsId")
+
+        return dokumenter
     }
 }
