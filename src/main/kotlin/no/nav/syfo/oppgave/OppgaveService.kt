@@ -1,5 +1,6 @@
 package no.nav.syfo.oppgave
 
+import no.nav.syfo.application.db.DatabaseInterface
 import no.nav.syfo.log
 import no.nav.syfo.oppgave.client.OppdaterOppgaveRequest
 import no.nav.syfo.oppgave.client.OppgaveClient
@@ -15,6 +16,7 @@ class OppgaveService(
     private val oppgaveClient: OppgaveClient,
     private val safJournalpostService: SafJournalpostService,
     private val sykDigProducer: SykDigProducer,
+    private val database: DatabaseInterface,
     private val cluster: String
 ) {
     suspend fun handleOppgave(oppgaveId: Long, fnr: String) {
@@ -27,6 +29,7 @@ class OppgaveService(
 
             log.info("Utenlandsk sykmelding fra Rina: OppgaveId $oppgaveId, journalpostId ${oppgave.journalpostId}, dokumenter $dokumenter")
             if (oppgave.erTildeltNavOppfolgningUtlang()) {
+                // val ulosteOppgaver = database.getUlosteOppgaver() TODO getUlosteOppgaver
                 if (dokumenter != null) {
                     oppgaveClient.oppdaterOppgave(
                         OppdaterOppgaveRequest(

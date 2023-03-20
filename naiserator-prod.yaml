@@ -6,6 +6,12 @@ metadata:
   labels:
     team: teamsykmelding
 spec:
+  gcp:
+    permissions:
+      - resource:
+          apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+          kind: Project
+        role: roles/cloudsql.client
   image: {{ image }}
   replicas:
     min: 1
