@@ -45,7 +45,11 @@ spec:
     application:
       enabled: true
       tenant: trygdeetaten.no
+  envFrom:
+    - secret: google-sql-syk-dig-backend-syk-dig-backend-syk-dig-opp-b187588a
   env:
+    - name: CLOUD_SQL_INSTANCE
+      value: teamsykmelding-dev-1d34:europe-north1:syk-dig-backend-db-instance
     - name: OPPGAVE_URL
       value: https://oppgave-q1.dev-fss-pub.nais.io/api/v1/oppgaver
     - name: OPPGAVE_SCOPE
