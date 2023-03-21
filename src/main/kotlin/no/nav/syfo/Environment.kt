@@ -12,7 +12,6 @@ data class Environment(
     val safUrl: String = getEnvVar("SAF_URL"),
     val safScope: String = getEnvVar("SAF_SCOPE"),
     val sykDigTopic: String = "teamsykmelding.syk-dig-oppgave",
-    val cluster: String = getEnvVar("NAIS_CLUSTER_NAME"),
     val cloudSqlInstance: String = getEnvVar("CLOUD_SQL_INSTANCE"),
     val dbHost: String = getEnvVar("DB_SYK_DIG_OPPGAVELYTTER_HOST"),
     val dbPort: String = getEnvVar("DB_SYK_DIG_OPPGAVELYTTER_PORT"),

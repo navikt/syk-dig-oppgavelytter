@@ -4,7 +4,6 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import no.nav.syfo.Environment
 import java.sql.Connection
-import java.sql.ResultSet
 import java.util.Properties
 
 class Database(
@@ -33,11 +32,5 @@ class Database(
                 validate()
             }
         )
-    }
-}
-
-fun <T> ResultSet.toList(mapper: ResultSet.() -> T) = mutableListOf<T>().apply {
-    while (next()) {
-        add(mapper())
     }
 }

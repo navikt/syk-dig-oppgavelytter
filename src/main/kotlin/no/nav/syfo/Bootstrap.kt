@@ -109,7 +109,7 @@ fun main() {
     val oppgaveConsumer = OppgaveConsumer(
         oppgaveTopic = env.oppgaveTopic,
         kafkaConsumer = getKafkaConsumer(),
-        oppgaveService = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, database, env.cluster),
+        oppgaveService = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, database),
         applicationState = applicationState
     )
     oppgaveConsumer.startConsumer()
