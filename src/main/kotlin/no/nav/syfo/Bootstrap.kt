@@ -16,6 +16,7 @@ import no.nav.syfo.accesstoken.AccessTokenClient
 import no.nav.syfo.application.ApplicationServer
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.createApplicationEngine
+import no.nav.syfo.application.db.Database
 import no.nav.syfo.application.exception.ServiceUnavailableException
 import no.nav.syfo.kafka.aiven.KafkaUtils
 import no.nav.syfo.kafka.toConsumerConfig
@@ -42,6 +43,8 @@ val log: Logger = LoggerFactory.getLogger("no.nav.syfo.syk-dig-oppgavelytter")
 
 fun main() {
     val env = Environment()
+    val database = Database(env)
+
     DefaultExports.initialize()
     val applicationState = ApplicationState()
     val applicationEngine = createApplicationEngine(
@@ -106,7 +109,7 @@ fun main() {
     val oppgaveConsumer = OppgaveConsumer(
         oppgaveTopic = env.oppgaveTopic,
         kafkaConsumer = getKafkaConsumer(),
-        oppgaveService = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, env.cluster),
+        oppgaveService = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, database),
         applicationState = applicationState
     )
     oppgaveConsumer.startConsumer()
