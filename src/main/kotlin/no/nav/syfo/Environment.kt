@@ -17,7 +17,8 @@ data class Environment(
     val dbPort: String = getEnvVar("DB_SYK_DIG_OPPGAVELYTTER_PORT"),
     val dbName: String = getEnvVar("DB_SYK_DIG_OPPGAVELYTTER_DATABASE"),
     val databaseUsername: String = getEnvVar("DB_SYK_DIG_OPPGAVELYTTER_USERNAME"),
-    val databasePassword: String = getEnvVar("DB_SYK_DIG_OPPGAVELYTTER_PASSWORD")
+    val databasePassword: String = getEnvVar("DB_SYK_DIG_OPPGAVELYTTER_PASSWORD"),
+    val cluster: String = getEnvVar("NAIS_CLUSTER_NAME")
 )
 
 fun getEnvVar(varName: String, defaultValue: String? = null) =

@@ -23,7 +23,7 @@ class OppgaveServiceTest : FunSpec({
     val database = mockk<DatabaseInterface>()
     mockkStatic(DatabaseInterface::getUlosteOppgaveCount)
 
-    val oppgaveService = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, database)
+    val oppgaveService = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, database, "prod-gcp")
 
     beforeEach {
         clearMocks(oppgaveClient, safJournalpostService, sykDigProducer, database)
@@ -128,7 +128,7 @@ class OppgaveServiceTest : FunSpec({
         }
 
         test("Sender sykmelding til syk-dig i prod-gcp") {
-            val oppgavesServiceProd = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, database)
+            val oppgavesServiceProd = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, database, "prod-gcp")
             coEvery { oppgaveClient.oppdaterOppgave(any(), any()) } just Runs
             coEvery { oppgaveClient.hentOppgave(any(), any()) } returns OppgaveResponse(
                 journalpostId = "5566",

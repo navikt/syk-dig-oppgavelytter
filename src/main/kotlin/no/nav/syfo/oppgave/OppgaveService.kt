@@ -17,7 +17,8 @@ class OppgaveService(
     private val oppgaveClient: OppgaveClient,
     private val safJournalpostService: SafJournalpostService,
     private val sykDigProducer: SykDigProducer,
-    private val database: DatabaseInterface
+    private val database: DatabaseInterface,
+    private val cluster: String
 ) {
     suspend fun handleOppgave(oppgaveId: Long, fnr: String) {
         val sporingsId = UUID.randomUUID().toString()
@@ -27,7 +28,7 @@ class OppgaveService(
             log.info("Oppgave med id $oppgaveId  og journalpostId ${oppgave.journalpostId} gjelder utenlandsk sykmelding fra Rina, sporingsId $sporingsId")
 
             log.info("Utenlandsk sykmelding fra Rina: OppgaveId $oppgaveId, journalpostId ${oppgave.journalpostId}")
-            if (oppgave.erTildeltNavOppfolgningUtlang()) {
+            if (oppgave.erTildeltNavOppfolgningUtlang() || cluster == "dev-gcp") {
                 val ulosteOppgaver = database.getUlosteOppgaveCount()
                 log.info("uløste oppgaver $ulosteOppgaver, limit $ULOSTE_OPPGAVER_LIMIT")
                 if (ULOSTE_OPPGAVER_LIMIT < ulosteOppgaver) {
