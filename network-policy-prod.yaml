@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: syk-dig-oppgavelytter-db
+  namespace: teamsykmelding
+spec:
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 35.228.144.75/32
+  podSelector:
+    matchLabels:
+      app: syk-dig-oppgavelytter
+  policyTypes:
+    - Egress
