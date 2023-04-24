@@ -19,7 +19,7 @@ val kotlinVersion = "1.8.20"
 val kotestVersion = "5.6.1"
 val postgresVersion = "42.6.0"
 val hikariVersion = "5.0.1"
-val googlePostgresVersion = "1.7.2"
+val googlePostgresVersion = "1.11.1"
 val flywayVersion = "9.16.3"
 val testContainerVersion = "1.17.6"
 tasks.withType<Jar> {
