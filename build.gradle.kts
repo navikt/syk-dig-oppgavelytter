@@ -20,7 +20,7 @@ val kotestVersion = "5.5.4"
 val postgresVersion = "42.5.1"
 val hikariVersion = "5.0.1"
 val googlePostgresVersion = "1.7.2"
-val flywayVersion = "9.8.3"
+val flywayVersion = "9.16.3"
 val testContainerVersion = "1.17.6"
 tasks.withType<Jar> {
     manifest.attributes["Main-Class"] = "no.nav.syfo.BootstrapKt"
