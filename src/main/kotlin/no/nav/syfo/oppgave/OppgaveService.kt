@@ -31,7 +31,7 @@ class OppgaveService(
             if (oppgave.erTildeltNavOppfolgningUtlang() || cluster == "dev-gcp") {
                 val ulosteOppgaver = database.getUlosteOppgaveCount()
                 log.info("uløste oppgaver $ulosteOppgaver, limit $ULOSTE_OPPGAVER_LIMIT")
-                if (ULOSTE_OPPGAVER_LIMIT < ulosteOppgaver) {
+                if (ULOSTE_OPPGAVER_LIMIT < ulosteOppgaver && cluster != "dev-gcp") {
                     log.info("Uløste oppgaver er større enn limit, sender ikke til syk-dig")
                     return
                 }
