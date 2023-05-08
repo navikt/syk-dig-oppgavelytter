@@ -33,13 +33,13 @@ class SafJournalpostServiceTest : FunSpec({
                     JournalpostResponse(
                         dokumenter = listOf(
                             DokumentInfo("123", "tittel", "S055", listOf(Dokumentvariant("ARKIV"))),
-                            DokumentInfo("456", "tittel", null, listOf(Dokumentvariant("ORIGINAL")))
+                            DokumentInfo("456", "tittel", null, listOf(Dokumentvariant("ORIGINAL"))),
                         ),
                         journalstatus = "MOTTATT",
-                        kanal = "ESSI"
-                    )
+                        kanal = "ESSI",
+                    ),
                 ),
-                emptyList()
+                emptyList(),
             )
 
             val dokumentInfoId = safJournalpostService.getDokumenter("jpId", "sporing")
@@ -52,13 +52,13 @@ class SafJournalpostServiceTest : FunSpec({
                     JournalpostResponse(
                         dokumenter = listOf(
                             DokumentInfo("123", "tittel", "S055", listOf(Dokumentvariant("ARKIV"))),
-                            DokumentInfo("456", "tittel", null, listOf(Dokumentvariant("ORIGINAL")))
+                            DokumentInfo("456", "tittel", null, listOf(Dokumentvariant("ORIGINAL"))),
                         ),
                         journalstatus = "FERDIGSTILT",
-                        kanal = "ESSI"
-                    )
+                        kanal = "ESSI",
+                    ),
                 ),
-                emptyList()
+                emptyList(),
             )
 
             val dokumentInfoId = safJournalpostService.getDokumenter("jpId", "sporing")
@@ -71,13 +71,13 @@ class SafJournalpostServiceTest : FunSpec({
                     JournalpostResponse(
                         dokumenter = listOf(
                             DokumentInfo("123", "tittel", "S055", listOf(Dokumentvariant("SLADDET"))),
-                            DokumentInfo("456", "tittel", null, listOf(Dokumentvariant("ORIGINAL")))
+                            DokumentInfo("456", "tittel", null, listOf(Dokumentvariant("ORIGINAL"))),
                         ),
                         journalstatus = "MOTTATT",
-                        kanal = "ESSI"
-                    )
+                        kanal = "ESSI",
+                    ),
                 ),
-                emptyList()
+                emptyList(),
             )
 
             assertFailsWith<RuntimeException> {

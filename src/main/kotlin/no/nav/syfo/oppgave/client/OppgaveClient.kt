@@ -17,7 +17,7 @@ class OppgaveClient(
     private val url: String,
     private val accessTokenClient: AccessTokenClient,
     private val httpClient: HttpClient,
-    private val scope: String
+    private val scope: String,
 ) {
     suspend fun hentOppgave(oppgaveId: Long, sporingsId: String): OppgaveResponse {
         try {
@@ -57,11 +57,11 @@ data class OppgaveResponse(
     val versjon: Int,
     val metadata: Map<String, String?>?,
     val ferdigstiltTidspunkt: String?,
-    val tildeltEnhetsnr: String
+    val tildeltEnhetsnr: String,
 )
 
 data class OppdaterOppgaveRequest(
     val id: Int,
     val versjon: Int,
-    val behandlesAvApplikasjon: String
+    val behandlesAvApplikasjon: String,
 )

@@ -10,16 +10,16 @@ import no.nav.syfo.oppgave.saf.model.DokumentMedTittel
 class SafJournalpostService(
     private val safGraphQlClient: SafGraphQlClient,
     private val accessTokenClient: AccessTokenClient,
-    private val scope: String
+    private val scope: String,
 ) {
     suspend fun getDokumenter(
         journalpostId: String,
-        sporingsId: String
+        sporingsId: String,
     ): List<DokumentMedTittel>? {
         val journalpost = safGraphQlClient.findJournalpost(
             journalpostId = journalpostId,
             token = accessTokenClient.getAccessToken(scope),
-            sporingsId = sporingsId
+            sporingsId = sporingsId,
         )
         journalpost.errors?.forEach {
             log.error("Feil ved henting av journalpost med id $journalpostId fra SAF: ${it.message}")
@@ -56,7 +56,7 @@ class SafJournalpostService(
 
     private fun finnDokumentInfoIdForSykmeldingPdfListe(
         dokumentListe: List<DokumentInfo>?,
-        sporingsId: String
+        sporingsId: String,
     ): List<DokumentMedTittel> {
         val dokumenter = dokumentListe?.filter { dokument ->
             dokument.dokumentvarianter?.any {

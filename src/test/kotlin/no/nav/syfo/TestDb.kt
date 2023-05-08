@@ -27,7 +27,7 @@ class TestDatabase(val connectionName: String, val dbUsername: String, val dbPas
                 connectionTimeout = 10_000
                 transactionIsolation = "TRANSACTION_REPEATABLE_READ"
                 validate()
-            }
+            },
         )
         runFlywayMigrations()
     }
@@ -71,7 +71,7 @@ class TestDB private constructor() {
                 it.prepareStatement(
                     """
                     DELETE FROM oppgave;
-                """
+                """,
                 ).use { ps ->
                     ps.executeUpdate()
                 }

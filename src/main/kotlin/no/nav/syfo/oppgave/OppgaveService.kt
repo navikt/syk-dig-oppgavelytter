@@ -1,5 +1,10 @@
 package no.nav.syfo.oppgave
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import no.nav.syfo.application.db.DatabaseInterface
 import no.nav.syfo.log
 import no.nav.syfo.oppgave.client.OppdaterOppgaveRequest
@@ -9,6 +14,7 @@ import no.nav.syfo.oppgave.db.getUlosteOppgaveCount
 import no.nav.syfo.oppgave.saf.SafJournalpostService
 import no.nav.syfo.oppgave.sykdig.DigitaliseringsoppgaveKafka
 import no.nav.syfo.oppgave.sykdig.SykDigProducer
+import no.nav.syfo.securelog
 import java.util.UUID
 
 const val NAV_OPPFOLGNING_UTLAND = "0393"
@@ -18,14 +24,23 @@ class OppgaveService(
     private val safJournalpostService: SafJournalpostService,
     private val sykDigProducer: SykDigProducer,
     private val database: DatabaseInterface,
-    private val cluster: String
+    private val cluster: String,
 ) {
     suspend fun handleOppgave(oppgaveId: Long, fnr: String) {
         val sporingsId = UUID.randomUUID().toString()
         val oppgave = oppgaveClient.hentOppgave(oppgaveId = oppgaveId, sporingsId = sporingsId)
 
+        val objectMapper: ObjectMapper = ObjectMapper().apply {
+            registerKotlinModule()
+            registerModule(JavaTimeModule())
+            configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        }
+
+        securelog.info("oppgave info: ${objectMapper.writeValueAsString(oppgave)}")
+
         if (oppgave.gjelderUtenlandskSykmeldingFraRina() && !oppgave.journalpostId.isNullOrEmpty()) {
-            log.info("Oppgave med id $oppgaveId  og journalpostId ${oppgave.journalpostId} gjelder utenlandsk sykmelding fra Rina, sporingsId $sporingsId")
+            log.info("Oppgave med id $oppgaveId og journalpostId ${oppgave.journalpostId} gjelder utenlandsk sykmelding fra Rina, sporingsId $sporingsId")
 
             log.info("Utenlandsk sykmelding fra Rina: OppgaveId $oppgaveId, journalpostId ${oppgave.journalpostId}")
             if (oppgave.erTildeltNavOppfolgningUtlang() || cluster == "dev-gcp") {
@@ -41,9 +56,9 @@ class OppgaveService(
                         OppdaterOppgaveRequest(
                             id = oppgaveId.toInt(),
                             behandlesAvApplikasjon = "SMD",
-                            versjon = oppgave.versjon
+                            versjon = oppgave.versjon,
                         ),
-                        sporingsId
+                        sporingsId,
                     )
                     sykDigProducer.send(
                         sporingsId,
@@ -53,8 +68,8 @@ class OppgaveService(
                             journalpostId = oppgave.journalpostId,
                             dokumentInfoId = dokumenter.first().dokumentInfoId,
                             type = "UTLAND",
-                            dokumenter = dokumenter
-                        )
+                            dokumenter = dokumenter,
+                        ),
                     )
                     log.info("Sendt sykmelding til syk-dig for oppgaveId $oppgaveId, sporingsId $sporingsId")
                 } else {

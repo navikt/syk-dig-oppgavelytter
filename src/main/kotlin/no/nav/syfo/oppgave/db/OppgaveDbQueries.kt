@@ -5,7 +5,7 @@ import no.nav.syfo.application.db.DatabaseInterface
 fun DatabaseInterface.getUlosteOppgaveCount(): Int {
     return connection.use { conn ->
         conn.prepareStatement(
-            """SELECT count('any') from oppgave where ferdigstilt is null"""
+            """SELECT count('any') from oppgave where ferdigstilt is null""",
         ).use { ps ->
             ps.executeQuery().use {
                 if (it.next()) {

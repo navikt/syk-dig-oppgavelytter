@@ -29,7 +29,7 @@ class OppgaveServiceTest : FunSpec({
         clearMocks(oppgaveClient, safJournalpostService, sykDigProducer, database)
         coEvery { safJournalpostService.getDokumenter(any(), any()) } returns listOf(
             DokumentMedTittel("123", "123dokument"),
-            DokumentMedTittel("456", "456dokument")
+            DokumentMedTittel("456", "456dokument"),
         )
         coEvery { sykDigProducer.send(any(), any()) } just Runs
         coEvery { database.getUlosteOppgaveCount() } returns 1
@@ -47,7 +47,7 @@ class OppgaveServiceTest : FunSpec({
                 versjon = 1,
                 metadata = mapOf("RINA_SAKID" to "111"),
                 ferdigstiltTidspunkt = null,
-                tildeltEnhetsnr = NAV_OPPFOLGNING_UTLAND
+                tildeltEnhetsnr = NAV_OPPFOLGNING_UTLAND,
             )
             coEvery { oppgaveClient.oppdaterOppgave(any(), any()) } just Runs
             oppgaveService.handleOppgave(1L, "fnr")
@@ -60,10 +60,10 @@ class OppgaveServiceTest : FunSpec({
                     match {
                         it.oppgaveId == "1" && it.journalpostId == "5566" &&
                             it.fnr == "fnr" && it.dokumentInfoId == "123" && it.type == "UTLAND" && it.dokumenter == listOf(
-                            DokumentMedTittel("123", "123dokument"),
-                            DokumentMedTittel("456", "456dokument")
-                        )
-                    }
+                                DokumentMedTittel("123", "123dokument"),
+                                DokumentMedTittel("456", "456dokument"),
+                            )
+                    },
                 )
             }
         }
@@ -79,7 +79,7 @@ class OppgaveServiceTest : FunSpec({
                 versjon = 1,
                 metadata = mapOf("RINA_SAKID" to "111"),
                 ferdigstiltTidspunkt = null,
-                tildeltEnhetsnr = NAV_OPPFOLGNING_UTLAND
+                tildeltEnhetsnr = NAV_OPPFOLGNING_UTLAND,
             )
 
             oppgaveService.handleOppgave(1L, "fnr")
@@ -98,7 +98,7 @@ class OppgaveServiceTest : FunSpec({
                 versjon = 1,
                 metadata = mapOf("RINA_SAKID" to "111"),
                 ferdigstiltTidspunkt = "2023-01-18T09:55:15.729+01:00",
-                tildeltEnhetsnr = NAV_OPPFOLGNING_UTLAND
+                tildeltEnhetsnr = NAV_OPPFOLGNING_UTLAND,
             )
 
             oppgaveService.handleOppgave(1L, "fnr")
@@ -117,7 +117,7 @@ class OppgaveServiceTest : FunSpec({
                 versjon = 1,
                 metadata = mapOf("RINA_SAKID" to "111"),
                 ferdigstiltTidspunkt = null,
-                tildeltEnhetsnr = NAV_OPPFOLGNING_UTLAND
+                tildeltEnhetsnr = NAV_OPPFOLGNING_UTLAND,
             )
             coEvery { database.getUlosteOppgaveCount() } returns 11
             coEvery { oppgaveClient.oppdaterOppgave(any(), any()) } just Runs
@@ -140,7 +140,7 @@ class OppgaveServiceTest : FunSpec({
                 versjon = 1,
                 metadata = mapOf("RINA_SAKID" to "111"),
                 ferdigstiltTidspunkt = null,
-                tildeltEnhetsnr = NAV_OPPFOLGNING_UTLAND
+                tildeltEnhetsnr = NAV_OPPFOLGNING_UTLAND,
             )
 
             oppgavesServiceProd.handleOppgave(1L, "fnr")

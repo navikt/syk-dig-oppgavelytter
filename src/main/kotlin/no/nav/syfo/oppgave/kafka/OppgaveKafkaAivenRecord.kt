@@ -4,18 +4,18 @@ import java.time.LocalDateTime
 
 data class OppgaveKafkaAivenRecord(
     val hendelse: Hendelse,
-    val oppgave: Oppgave
+    val oppgave: Oppgave,
 )
 
 data class Oppgave(
     val oppgaveId: Long,
     val bruker: Bruker?,
-    val kategorisering: Kategorisering
+    val kategorisering: Kategorisering,
 )
 
 data class Bruker(
     val ident: String,
-    val identType: IdentType
+    val identType: IdentType,
 )
 
 enum class IdentType {
@@ -26,12 +26,12 @@ data class Kategorisering(
     val tema: String,
     val oppgavetype: String,
     val behandlingstema: String?,
-    val behandlingstype: String?
+    val behandlingstype: String?,
 )
 
 data class Hendelse(
     val hendelsestype: Hendelsestype,
-    val tidspunkt: LocalDateTime
+    val tidspunkt: LocalDateTime,
 )
 
 enum class Hendelsestype {

@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory
 import java.net.SocketTimeoutException
 
 val log: Logger = LoggerFactory.getLogger("no.nav.syfo.syk-dig-oppgavelytter")
+val securelog: Logger = LoggerFactory.getLogger("securelog")
 
 fun main() {
     val env = Environment()
@@ -49,7 +50,7 @@ fun main() {
     val applicationState = ApplicationState()
     val applicationEngine = createApplicationEngine(
         env,
-        applicationState
+        applicationState,
     )
     val applicationServer = ApplicationServer(applicationEngine, applicationState)
 
@@ -77,40 +78,40 @@ fun main() {
         aadAccessTokenUrl = env.aadAccessTokenUrl,
         clientId = env.clientId,
         clientSecret = env.clientSecret,
-        httpClient = httpClient
+        httpClient = httpClient,
     )
 
     val oppgaveClient = OppgaveClient(
         url = env.oppgaveUrl,
         accessTokenClient = accessTokenClient,
         httpClient = httpClient,
-        scope = env.oppgaveScope
+        scope = env.oppgaveScope,
     )
 
     val safGraphQlClient = SafGraphQlClient(
         httpClient = httpClient,
         basePath = "${env.safUrl}/graphql",
-        graphQlQuery = SafGraphQlClient::class.java.getResource("/graphql/findJournalpost.graphql")!!.readText().replace(Regex("[\n\t]"), "")
+        graphQlQuery = SafGraphQlClient::class.java.getResource("/graphql/findJournalpost.graphql")!!.readText().replace(Regex("[\n\t]"), ""),
     )
     val safJournalpostService = SafJournalpostService(
         safGraphQlClient = safGraphQlClient,
         accessTokenClient = accessTokenClient,
-        scope = env.safScope
+        scope = env.safScope,
     )
 
     val sykDigProducer = SykDigProducer(
         KafkaProducer<String, DigitaliseringsoppgaveKafka>(
             KafkaUtils.getAivenKafkaConfig()
-                .toProducerConfig(env.applicationName, valueSerializer = JacksonKafkaSerializer::class)
+                .toProducerConfig(env.applicationName, valueSerializer = JacksonKafkaSerializer::class),
         ),
-        env.sykDigTopic
+        env.sykDigTopic,
     )
 
     val oppgaveConsumer = OppgaveConsumer(
         oppgaveTopic = env.oppgaveTopic,
         kafkaConsumer = getKafkaConsumer(),
         oppgaveService = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, database, env.cluster),
-        applicationState = applicationState
+        applicationState = applicationState,
     )
     oppgaveConsumer.startConsumer()
 
@@ -124,7 +125,7 @@ private fun getKafkaConsumer(): KafkaConsumer<String, OppgaveKafkaAivenRecord> {
             it[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = 50
         }.toConsumerConfig("syk-dig-oppgavelytter-consumer", JacksonKafkaDeserializer::class),
         StringDeserializer(),
-        JacksonKafkaDeserializer(OppgaveKafkaAivenRecord::class)
+        JacksonKafkaDeserializer(OppgaveKafkaAivenRecord::class),
     )
     return kafkaConsumer
 }

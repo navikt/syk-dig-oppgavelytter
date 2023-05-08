@@ -33,7 +33,7 @@ private fun insertOppgave(id: String, ferdigstilt: OffsetDateTime?) {
             """
             INSERT INTO oppgave(oppgave_id, ferdigstilt)
             VALUES (?, ?);
-        """
+        """,
         ).use { preparedStatement ->
             preparedStatement.setString(1, id)
             preparedStatement.setTimestamp(2, ferdigstilt?.let { Timestamp.from(it.toInstant()) })

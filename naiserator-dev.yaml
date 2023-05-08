@@ -50,6 +50,8 @@ spec:
       external:
         - host: oppgave-q1.dev-fss-pub.nais.io
         - host: saf.dev-fss-pub.nais.io
+  secureLogs:
+    enabled: true
   envFrom:
     - secret: google-sql-syk-dig-backend-syk-dig-backend-syk-dig-opp-b187588a
   env:

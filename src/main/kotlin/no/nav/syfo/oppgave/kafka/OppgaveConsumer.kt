@@ -15,7 +15,7 @@ class OppgaveConsumer(
     private val oppgaveTopic: String,
     private val kafkaConsumer: KafkaConsumer<String, OppgaveKafkaAivenRecord>,
     private val oppgaveService: OppgaveService,
-    private val applicationState: ApplicationState
+    private val applicationState: ApplicationState,
 ) {
 
     @OptIn(DelicateCoroutinesApi::class)
