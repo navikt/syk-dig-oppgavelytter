@@ -1,6 +1,7 @@
 package no.nav.syfo
 
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
@@ -41,6 +42,13 @@ import java.net.SocketTimeoutException
 
 val log: Logger = LoggerFactory.getLogger("no.nav.syfo.syk-dig-oppgavelytter")
 val securelog: Logger = LoggerFactory.getLogger("securelog")
+
+val objectMapper: ObjectMapper = ObjectMapper().apply {
+    registerKotlinModule()
+    registerModule(JavaTimeModule())
+    configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+    configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+}
 
 fun main() {
     val env = Environment()

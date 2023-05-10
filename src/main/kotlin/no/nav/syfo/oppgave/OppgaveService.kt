@@ -1,12 +1,8 @@
 package no.nav.syfo.oppgave
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import no.nav.syfo.application.db.DatabaseInterface
 import no.nav.syfo.log
+import no.nav.syfo.objectMapper
 import no.nav.syfo.oppgave.client.OppdaterOppgaveRequest
 import no.nav.syfo.oppgave.client.OppgaveClient
 import no.nav.syfo.oppgave.client.OppgaveResponse
@@ -29,13 +25,6 @@ class OppgaveService(
     suspend fun handleOppgave(oppgaveId: Long, fnr: String) {
         val sporingsId = UUID.randomUUID().toString()
         val oppgave = oppgaveClient.hentOppgave(oppgaveId = oppgaveId, sporingsId = sporingsId)
-
-        val objectMapper: ObjectMapper = ObjectMapper().apply {
-            registerKotlinModule()
-            registerModule(JavaTimeModule())
-            configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        }
 
         securelog.info("oppgave info: ${objectMapper.writeValueAsString(oppgave)}")
 
