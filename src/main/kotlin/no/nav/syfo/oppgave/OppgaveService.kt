@@ -2,7 +2,6 @@ package no.nav.syfo.oppgave
 
 import no.nav.syfo.application.db.DatabaseInterface
 import no.nav.syfo.log
-import no.nav.syfo.objectMapper
 import no.nav.syfo.oppgave.client.OppdaterOppgaveRequest
 import no.nav.syfo.oppgave.client.OppgaveClient
 import no.nav.syfo.oppgave.client.OppgaveResponse
@@ -10,11 +9,11 @@ import no.nav.syfo.oppgave.db.getUlosteOppgaveCount
 import no.nav.syfo.oppgave.saf.SafJournalpostService
 import no.nav.syfo.oppgave.sykdig.DigitaliseringsoppgaveKafka
 import no.nav.syfo.oppgave.sykdig.SykDigProducer
-import no.nav.syfo.securelog
 import java.util.UUID
 
 const val NAV_OPPFOLGNING_UTLAND = "0393"
 private const val ULOSTE_OPPGAVER_LIMIT = 10
+
 class OppgaveService(
     private val oppgaveClient: OppgaveClient,
     private val safJournalpostService: SafJournalpostService,
@@ -26,12 +25,12 @@ class OppgaveService(
         val sporingsId = UUID.randomUUID().toString()
         val oppgave = oppgaveClient.hentOppgave(oppgaveId = oppgaveId, sporingsId = sporingsId)
 
-        securelog.info("oppgave info: ${objectMapper.writeValueAsString(oppgave)}")
+        if ((oppgave.gjelderUtenlandskSykmeldingFraRina() || oppgave.gjelderUtenlandskSykmeldingFraNAVNO()) &&
+            !oppgave.journalpostId.isNullOrEmpty()
+        ) {
+            log.info("Oppgave med id $oppgaveId og journalpostId ${oppgave.journalpostId} gjelder utenlandsk sykmelding, sporingsId $sporingsId")
 
-        if (oppgave.gjelderUtenlandskSykmeldingFraRina() && !oppgave.journalpostId.isNullOrEmpty()) {
-            log.info("Oppgave med id $oppgaveId og journalpostId ${oppgave.journalpostId} gjelder utenlandsk sykmelding fra Rina, sporingsId $sporingsId")
-
-            log.info("Utenlandsk sykmelding fra Rina: OppgaveId $oppgaveId, journalpostId ${oppgave.journalpostId}")
+            log.info("Utenlandsk sykmelding: OppgaveId $oppgaveId, journalpostId ${oppgave.journalpostId}")
             if (oppgave.erTildeltNavOppfolgningUtlang() || cluster == "dev-gcp") {
                 val ulosteOppgaver = database.getUlosteOppgaveCount()
                 log.info("uløste oppgaver $ulosteOppgaver, limit $ULOSTE_OPPGAVER_LIMIT")
@@ -39,7 +38,8 @@ class OppgaveService(
                     log.info("Uløste oppgaver er større enn limit, sender ikke til syk-dig")
                     return
                 }
-                val dokumenter = safJournalpostService.getDokumenter(journalpostId = oppgave.journalpostId, sporingsId = sporingsId)
+                val dokumenter =
+                    safJournalpostService.getDokumenter(journalpostId = oppgave.journalpostId, sporingsId = sporingsId)
                 if (dokumenter != null) {
                     oppgaveClient.oppdaterOppgave(
                         OppdaterOppgaveRequest(
@@ -58,6 +58,7 @@ class OppgaveService(
                             dokumentInfoId = dokumenter.first().dokumentInfoId,
                             type = "UTLAND",
                             dokumenter = dokumenter,
+                            source = setSoruce(oppgave),
                         ),
                     )
                     log.info("Sendt sykmelding til syk-dig for oppgaveId $oppgaveId, sporingsId $sporingsId")
@@ -74,6 +75,22 @@ class OppgaveService(
         return ferdigstiltTidspunkt.isNullOrEmpty() && behandlesAvApplikasjon == null &&
             tema == "SYM" && behandlingstype == "ae0106" && behandlingstema.isNullOrEmpty() &&
             oppgavetype == "JFR" && metadata?.get("RINA_SAKID") != null
+    }
+
+    private fun OppgaveResponse.gjelderUtenlandskSykmeldingFraNAVNO(): Boolean {
+        return ferdigstiltTidspunkt.isNullOrEmpty() && behandlesAvApplikasjon == null &&
+            tema == "SYK" && behandlingstype == "ae0106" && behandlingstema.isNullOrEmpty() &&
+            oppgavetype == "JFR"
+    }
+
+    private fun setSoruce(oppgave: OppgaveResponse): String {
+        return if (oppgave.gjelderUtenlandskSykmeldingFraRina()) {
+            "rina"
+        } else if (oppgave.gjelderUtenlandskSykmeldingFraNAVNO()) {
+            "navno"
+        } else {
+            throw RuntimeException("Ukjent type kilde")
+        }
     }
 
     private fun OppgaveResponse.erTildeltNavOppfolgningUtlang() = tildeltEnhetsnr == NAV_OPPFOLGNING_UTLAND

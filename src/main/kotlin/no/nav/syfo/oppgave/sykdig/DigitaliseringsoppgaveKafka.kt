@@ -9,5 +9,5 @@ data class DigitaliseringsoppgaveKafka(
     val dokumentInfoId: String,
     val type: String,
     val dokumenter: List<DokumentMedTittel>,
-    val source: String = "rina",
+    val source: String,
 )
