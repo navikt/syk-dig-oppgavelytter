@@ -50,7 +50,7 @@ class OppgaveConsumer(
                         oppgaveKafkaAivenRecord ->
                     securelog.info(
                         "oppgave Egenerklæring for utenlandske sykemeldinger: " +
-                            "${objectMapper.writeValueAsString(oppgaveKafkaAivenRecord)}",
+                            "${objectMapper.writeValueAsString(oppgaveKafkaAivenRecord.oppgave)}",
                     )
                 }
 
