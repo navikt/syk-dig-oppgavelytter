@@ -27,7 +27,7 @@ class OppgaveServiceTest : FunSpec({
 
     beforeEach {
         clearMocks(oppgaveClient, safJournalpostService, sykDigProducer, database)
-        coEvery { safJournalpostService.getDokumenter(any(), any()) } returns listOf(
+        coEvery { safJournalpostService.getDokumenter(any(), any(), any()) } returns listOf(
             DokumentMedTittel("123", "123dokument"),
             DokumentMedTittel("456", "456dokument"),
         )
@@ -52,7 +52,7 @@ class OppgaveServiceTest : FunSpec({
             coEvery { oppgaveClient.oppdaterOppgave(any(), any()) } just Runs
             oppgaveService.handleOppgave(1L, "fnr")
 
-            coVerify { safJournalpostService.getDokumenter("5566", any()) }
+            coVerify { safJournalpostService.getDokumenter("5566", any(), any()) }
             coVerify { oppgaveClient.oppdaterOppgave(match { it.id == 1 && it.versjon == 1 && it.behandlesAvApplikasjon == "SMD" }, any()) }
             coVerify {
                 sykDigProducer.send(
@@ -84,7 +84,7 @@ class OppgaveServiceTest : FunSpec({
 
             oppgaveService.handleOppgave(1L, "fnr")
 
-            coVerify(exactly = 0) { safJournalpostService.getDokumenter(any(), any()) }
+            coVerify(exactly = 0) { safJournalpostService.getDokumenter(any(), any(), any()) }
         }
 
         test("Henter ikke dokumentInfoId for ferdigstilt utenlandsk sykmelding-oppgave som kommer fra Rina") {
@@ -103,7 +103,7 @@ class OppgaveServiceTest : FunSpec({
 
             oppgaveService.handleOppgave(1L, "fnr")
 
-            coVerify(exactly = 0) { safJournalpostService.getDokumenter(any(), any()) }
+            coVerify(exactly = 0) { safJournalpostService.getDokumenter(any(), any(), any()) }
         }
 
         test("Sender ikke til syk dig om uløste oppgaver er 10 eller mer") {
@@ -123,7 +123,7 @@ class OppgaveServiceTest : FunSpec({
             coEvery { oppgaveClient.oppdaterOppgave(any(), any()) } just Runs
             oppgaveService.handleOppgave(1L, "fnr")
 
-            coVerify(exactly = 0) { safJournalpostService.getDokumenter("5566", any()) }
+            coVerify(exactly = 0) { safJournalpostService.getDokumenter("5566", any(), any()) }
             coVerify(exactly = 0) { oppgaveClient.oppdaterOppgave(match { it.id == 1 && it.versjon == 1 && it.behandlesAvApplikasjon == "SMD" }, any()) }
         }
 
@@ -145,7 +145,7 @@ class OppgaveServiceTest : FunSpec({
 
             oppgavesServiceProd.handleOppgave(1L, "fnr")
 
-            coVerify { safJournalpostService.getDokumenter("5566", any()) }
+            coVerify { safJournalpostService.getDokumenter("5566", any(), any()) }
             coVerify(exactly = 1) { oppgaveClient.oppdaterOppgave(any(), any()) }
             coVerify(exactly = 1) { sykDigProducer.send(any(), any()) }
         }

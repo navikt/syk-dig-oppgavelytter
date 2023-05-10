@@ -39,7 +39,7 @@ class OppgaveService(
                     return
                 }
                 val dokumenter =
-                    safJournalpostService.getDokumenter(journalpostId = oppgave.journalpostId, sporingsId = sporingsId)
+                    safJournalpostService.getDokumenter(journalpostId = oppgave.journalpostId, sporingsId = sporingsId, source = setSoruce(oppgave))
                 if (dokumenter != null) {
                     oppgaveClient.oppdaterOppgave(
                         OppdaterOppgaveRequest(
