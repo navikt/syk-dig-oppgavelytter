@@ -7,9 +7,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.log
-import no.nav.syfo.objectMapper
 import no.nav.syfo.oppgave.OppgaveService
-import no.nav.syfo.securelog
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import java.time.Duration
 
@@ -43,20 +41,7 @@ class OppgaveConsumer(
             if (records.isNotEmpty()) {
                 records.filter {
                     it.hendelse.hendelsestype == Hendelsestype.OPPGAVE_OPPRETTET &&
-                        it.oppgave.kategorisering.tema == "SYK" && it.oppgave.kategorisering.behandlingstype == "ae0106" &&
-                        it.oppgave.kategorisering.oppgavetype == "JFR" && it.oppgave.bruker != null &&
-                        it.oppgave.bruker.identType == IdentType.FOLKEREGISTERIDENT
-                }.forEach {
-                        oppgaveKafkaAivenRecord ->
-                    securelog.info(
-                        "oppgave Egenerklæring for utenlandske sykemeldinger: " +
-                            "${objectMapper.writeValueAsString(oppgaveKafkaAivenRecord.oppgave)}",
-                    )
-                }
-
-                records.filter {
-                    it.hendelse.hendelsestype == Hendelsestype.OPPGAVE_OPPRETTET &&
-                        it.oppgave.kategorisering.tema == "SYM" && it.oppgave.kategorisering.behandlingstype == "ae0106" &&
+                        (it.oppgave.kategorisering.tema == "SYM" || it.oppgave.kategorisering.tema == "SYK") && it.oppgave.kategorisering.behandlingstype == "ae0106" &&
                         it.oppgave.kategorisering.oppgavetype == "JFR" && it.oppgave.bruker != null &&
                         it.oppgave.bruker.identType == IdentType.FOLKEREGISTERIDENT
                 }.forEach {

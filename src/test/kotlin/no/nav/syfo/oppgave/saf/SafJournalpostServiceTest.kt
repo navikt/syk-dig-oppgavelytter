@@ -42,7 +42,7 @@ class SafJournalpostServiceTest : FunSpec({
                 emptyList(),
             )
 
-            val dokumentInfoId = safJournalpostService.getDokumenter("jpId", "sporing")
+            val dokumentInfoId = safJournalpostService.getDokumenter("jpId", "sporing", "rina")
 
             dokumentInfoId shouldBeEqualTo listOf(DokumentMedTittel("123", "tittel"))
         }
@@ -61,7 +61,7 @@ class SafJournalpostServiceTest : FunSpec({
                 emptyList(),
             )
 
-            val dokumentInfoId = safJournalpostService.getDokumenter("jpId", "sporing")
+            val dokumentInfoId = safJournalpostService.getDokumenter("jpId", "sporing", "rina")
 
             dokumentInfoId shouldBeEqualTo null
         }
@@ -81,7 +81,7 @@ class SafJournalpostServiceTest : FunSpec({
             )
 
             assertFailsWith<RuntimeException> {
-                safJournalpostService.getDokumenter("jpId", "sporing")
+                safJournalpostService.getDokumenter("jpId", "sporing", "rina")
             }
         }
     }

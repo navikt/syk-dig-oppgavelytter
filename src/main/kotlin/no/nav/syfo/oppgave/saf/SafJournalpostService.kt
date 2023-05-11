@@ -15,6 +15,7 @@ class SafJournalpostService(
     suspend fun getDokumenter(
         journalpostId: String,
         sporingsId: String,
+        source: String,
     ): List<DokumentMedTittel>? {
         val journalpost = safGraphQlClient.findJournalpost(
             journalpostId = journalpostId,
@@ -30,10 +31,10 @@ class SafJournalpostService(
         }
 
         journalpost.data.journalpost?.let {
-            if (it.kanal != "EESSI") {
+            if (it.kanal != "EESSI" && source == "rina") {
                 log.warn("Journalpost med id $journalpostId har ikke forventet mottakskanal: ${it.kanal}, $sporingsId")
             }
-            if (it.dokumenter?.any { it.brevkode == "S055" } == false) {
+            if (it.dokumenter?.any { it.brevkode == "S055" } == false && source == "rina") {
                 log.warn("Journalpost med id $journalpostId har ingen dokumenter med forventet brevkode, $sporingsId")
             }
 

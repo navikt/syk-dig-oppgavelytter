@@ -1,6 +1,8 @@
 package no.nav.syfo.oppgave.sykdig
 
 import no.nav.syfo.log
+import no.nav.syfo.objectMapper
+import no.nav.syfo.securelog
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 
@@ -18,6 +20,10 @@ class SykDigProducer(
                 ),
             ).get()
         } catch (ex: Exception) {
+            securelog.error(
+                "Noe gikk galt ved skriving av digitaliseringsoppgave til kafka for oppgave ${objectMapper.writeValueAsString(digitaliseringsoppgave)} med sporingsId $sporingsId",
+                ex.message,
+            )
             log.error(
                 "Noe gikk galt ved skriving av digitaliseringsoppgave til kafka for oppgaveId ${digitaliseringsoppgave.oppgaveId} og sporingsId $sporingsId",
                 ex.message,
