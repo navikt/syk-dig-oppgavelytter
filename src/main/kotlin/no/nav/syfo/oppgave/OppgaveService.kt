@@ -5,14 +5,12 @@ import no.nav.syfo.log
 import no.nav.syfo.oppgave.client.OppdaterOppgaveRequest
 import no.nav.syfo.oppgave.client.OppgaveClient
 import no.nav.syfo.oppgave.client.OppgaveResponse
-import no.nav.syfo.oppgave.db.getUlosteOppgaveCount
 import no.nav.syfo.oppgave.saf.SafJournalpostService
 import no.nav.syfo.oppgave.sykdig.DigitaliseringsoppgaveKafka
 import no.nav.syfo.oppgave.sykdig.SykDigProducer
 import java.util.UUID
 
 const val NAV_OPPFOLGNING_UTLAND = "0393"
-private const val ULOSTE_OPPGAVER_LIMIT = 10
 
 class OppgaveService(
     private val oppgaveClient: OppgaveClient,
@@ -32,12 +30,6 @@ class OppgaveService(
 
             log.info("Utenlandsk sykmelding: OppgaveId $oppgaveId, journalpostId ${oppgave.journalpostId}")
             if (oppgave.erTildeltNavOppfolgningUtlang() || cluster == "dev-gcp") {
-                val ulosteOppgaver = database.getUlosteOppgaveCount()
-                log.info("uløste oppgaver $ulosteOppgaver, limit $ULOSTE_OPPGAVER_LIMIT")
-                if (ULOSTE_OPPGAVER_LIMIT < ulosteOppgaver && cluster != "dev-gcp") {
-                    log.info("Uløste oppgaver er større enn limit, sender ikke til syk-dig")
-                    return
-                }
                 val dokumenter =
                     safJournalpostService.getDokumenter(journalpostId = oppgave.journalpostId, sporingsId = sporingsId, source = setSoruce(oppgave))
                 if (dokumenter != null) {

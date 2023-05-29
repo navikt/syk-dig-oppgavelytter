@@ -7,11 +7,9 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
-import io.mockk.mockkStatic
 import no.nav.syfo.application.db.DatabaseInterface
 import no.nav.syfo.oppgave.client.OppgaveClient
 import no.nav.syfo.oppgave.client.OppgaveResponse
-import no.nav.syfo.oppgave.db.getUlosteOppgaveCount
 import no.nav.syfo.oppgave.saf.SafJournalpostService
 import no.nav.syfo.oppgave.saf.model.DokumentMedTittel
 import no.nav.syfo.oppgave.sykdig.SykDigProducer
@@ -21,7 +19,6 @@ class OppgaveServiceTest : FunSpec({
     val safJournalpostService = mockk<SafJournalpostService>()
     val sykDigProducer = mockk<SykDigProducer>()
     val database = mockk<DatabaseInterface>()
-    mockkStatic(DatabaseInterface::getUlosteOppgaveCount)
 
     val oppgaveService = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, database, "prod-gcp")
 
@@ -32,7 +29,6 @@ class OppgaveServiceTest : FunSpec({
             DokumentMedTittel("456", "456dokument"),
         )
         coEvery { sykDigProducer.send(any(), any()) } just Runs
-        coEvery { database.getUlosteOppgaveCount() } returns 1
     }
 
     context("OppgaveService") {
@@ -104,27 +100,6 @@ class OppgaveServiceTest : FunSpec({
             oppgaveService.handleOppgave(1L, "fnr")
 
             coVerify(exactly = 0) { safJournalpostService.getDokumenter(any(), any(), any()) }
-        }
-
-        test("Sender ikke til syk dig om uløste oppgaver er 10 eller mer") {
-            coEvery { oppgaveClient.hentOppgave(any(), any()) } returns OppgaveResponse(
-                journalpostId = "5566",
-                behandlesAvApplikasjon = null,
-                tema = "SYM",
-                behandlingstema = null,
-                oppgavetype = "JFR",
-                behandlingstype = "ae0106",
-                versjon = 1,
-                metadata = mapOf("RINA_SAKID" to "111"),
-                ferdigstiltTidspunkt = null,
-                tildeltEnhetsnr = NAV_OPPFOLGNING_UTLAND,
-            )
-            coEvery { database.getUlosteOppgaveCount() } returns 11
-            coEvery { oppgaveClient.oppdaterOppgave(any(), any()) } just Runs
-            oppgaveService.handleOppgave(1L, "fnr")
-
-            coVerify(exactly = 0) { safJournalpostService.getDokumenter("5566", any(), any()) }
-            coVerify(exactly = 0) { oppgaveClient.oppdaterOppgave(match { it.id == 1 && it.versjon == 1 && it.behandlesAvApplikasjon == "SMD" }, any()) }
         }
 
         test("Sender sykmelding til syk-dig i prod-gcp") {
