@@ -17,7 +17,6 @@ import no.nav.syfo.accesstoken.AccessTokenClient
 import no.nav.syfo.application.ApplicationServer
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.createApplicationEngine
-import no.nav.syfo.application.db.Database
 import no.nav.syfo.application.exception.ServiceUnavailableException
 import no.nav.syfo.kafka.aiven.KafkaUtils
 import no.nav.syfo.kafka.toConsumerConfig
@@ -52,7 +51,6 @@ val objectMapper: ObjectMapper = ObjectMapper().apply {
 
 fun main() {
     val env = Environment()
-    val database = Database(env)
 
     DefaultExports.initialize()
     val applicationState = ApplicationState()
@@ -118,7 +116,7 @@ fun main() {
     val oppgaveConsumer = OppgaveConsumer(
         oppgaveTopic = env.oppgaveTopic,
         kafkaConsumer = getKafkaConsumer(),
-        oppgaveService = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, database, env.cluster),
+        oppgaveService = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, env.cluster),
         applicationState = applicationState,
     )
     oppgaveConsumer.startConsumer()

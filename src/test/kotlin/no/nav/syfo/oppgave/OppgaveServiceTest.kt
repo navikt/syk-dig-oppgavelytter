@@ -7,7 +7,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
-import no.nav.syfo.application.db.DatabaseInterface
 import no.nav.syfo.oppgave.client.OppgaveClient
 import no.nav.syfo.oppgave.client.OppgaveResponse
 import no.nav.syfo.oppgave.saf.SafJournalpostService
@@ -18,12 +17,11 @@ class OppgaveServiceTest : FunSpec({
     val oppgaveClient = mockk<OppgaveClient>()
     val safJournalpostService = mockk<SafJournalpostService>()
     val sykDigProducer = mockk<SykDigProducer>()
-    val database = mockk<DatabaseInterface>()
 
-    val oppgaveService = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, database, "prod-gcp")
+    val oppgaveService = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, "prod-gcp")
 
     beforeEach {
-        clearMocks(oppgaveClient, safJournalpostService, sykDigProducer, database)
+        clearMocks(oppgaveClient, safJournalpostService, sykDigProducer)
         coEvery { safJournalpostService.getDokumenter(any(), any(), any()) } returns listOf(
             DokumentMedTittel("123", "123dokument"),
             DokumentMedTittel("456", "456dokument"),
@@ -103,7 +101,7 @@ class OppgaveServiceTest : FunSpec({
         }
 
         test("Sender sykmelding til syk-dig i prod-gcp") {
-            val oppgavesServiceProd = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, database, "prod-gcp")
+            val oppgavesServiceProd = OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, "prod-gcp")
             coEvery { oppgaveClient.oppdaterOppgave(any(), any()) } just Runs
             coEvery { oppgaveClient.hentOppgave(any(), any()) } returns OppgaveResponse(
                 journalpostId = "5566",
