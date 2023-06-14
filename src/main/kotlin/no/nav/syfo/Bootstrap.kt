@@ -127,7 +127,7 @@ fun main() {
 private fun getKafkaConsumer(): KafkaConsumer<String, OppgaveKafkaAivenRecord> {
     val kafkaConsumer = KafkaConsumer(
         KafkaUtils.getAivenKafkaConfig().also {
-            it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
+            it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "none"
             it[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = 50
         }.toConsumerConfig("syk-dig-oppgavelytter-consumer", JacksonKafkaDeserializer::class),
         StringDeserializer(),
