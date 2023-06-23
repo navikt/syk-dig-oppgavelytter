@@ -16,17 +16,30 @@ class SafGraphQlClient(
     private val basePath: String,
     private val graphQlQuery: String,
 ) {
-    suspend fun findJournalpost(journalpostId: String, token: String, sporingsId: String): FindJournalpostResponse {
-        val findJournalpostRequest = FindJournalpostRequest(query = graphQlQuery, variables = FindJournalpostVariables(journalpostId = journalpostId))
+    suspend fun findJournalpost(
+        journalpostId: String,
+        token: String,
+        sporingsId: String
+    ): FindJournalpostResponse {
+        val findJournalpostRequest =
+            FindJournalpostRequest(
+                query = graphQlQuery,
+                variables = FindJournalpostVariables(journalpostId = journalpostId)
+            )
         try {
-            return httpClient.post(basePath) {
-                setBody(findJournalpostRequest)
-                header(HttpHeaders.Authorization, "Bearer $token")
-                header("X-Correlation-ID", sporingsId)
-                header(HttpHeaders.ContentType, "application/json")
-            }.body()
+            return httpClient
+                .post(basePath) {
+                    setBody(findJournalpostRequest)
+                    header(HttpHeaders.Authorization, "Bearer $token")
+                    header("X-Correlation-ID", sporingsId)
+                    header(HttpHeaders.ContentType, "application/json")
+                }
+                .body()
         } catch (e: Exception) {
-            log.error("Noe gikk galt ved kall til SAF, journalpostId $journalpostId, sporingsId $sporingsId", e)
+            log.error(
+                "Noe gikk galt ved kall til SAF, journalpostId $journalpostId, sporingsId $sporingsId",
+                e
+            )
             throw e
         }
     }

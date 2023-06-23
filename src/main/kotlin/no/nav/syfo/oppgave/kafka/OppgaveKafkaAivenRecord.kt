@@ -19,7 +19,10 @@ data class Bruker(
 )
 
 enum class IdentType {
-    FOLKEREGISTERIDENT, NPID, ORGNR, SAMHANDLERNR
+    FOLKEREGISTERIDENT,
+    NPID,
+    ORGNR,
+    SAMHANDLERNR
 }
 
 data class Kategorisering(
@@ -35,5 +38,8 @@ data class Hendelse(
 )
 
 enum class Hendelsestype {
-    OPPGAVE_OPPRETTET, OPPGAVE_ENDRET, OPPGAVE_FERDIGSTILT, OPPGAVE_FEILREGISTRERT
+    OPPGAVE_OPPRETTET,
+    OPPGAVE_ENDRET,
+    OPPGAVE_FERDIGSTILT,
+    OPPGAVE_FEILREGISTRERT
 }

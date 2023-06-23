@@ -21,28 +21,41 @@ class OppgaveClient(
 ) {
     suspend fun hentOppgave(oppgaveId: Long, sporingsId: String): OppgaveResponse {
         try {
-            return httpClient.get("$url/$oppgaveId") {
-                val token = accessTokenClient.getAccessToken(scope)
-                header("Authorization", "Bearer $token")
-                header("X-Correlation-ID", sporingsId)
-            }.body<OppgaveResponse>()
+            return httpClient
+                .get("$url/$oppgaveId") {
+                    val token = accessTokenClient.getAccessToken(scope)
+                    header("Authorization", "Bearer $token")
+                    header("X-Correlation-ID", sporingsId)
+                }
+                .body<OppgaveResponse>()
         } catch (e: Exception) {
-            log.error("Noe gikk galt ved henting av oppgave med id $oppgaveId, sporingsId $sporingsId", e)
+            log.error(
+                "Noe gikk galt ved henting av oppgave med id $oppgaveId, sporingsId $sporingsId",
+                e
+            )
             throw e
         }
     }
 
-    suspend fun oppdaterOppgave(oppdaterOppgaveRequest: OppdaterOppgaveRequest, sporingsId: String) {
-        val httpResponse: HttpResponse = httpClient.patch("$url/${oppdaterOppgaveRequest.id}") {
-            contentType(ContentType.Application.Json)
-            val token = accessTokenClient.getAccessToken(scope)
-            header("Authorization", "Bearer $token")
-            header("X-Correlation-ID", sporingsId)
-            setBody(oppdaterOppgaveRequest)
-        }
+    suspend fun oppdaterOppgave(
+        oppdaterOppgaveRequest: OppdaterOppgaveRequest,
+        sporingsId: String
+    ) {
+        val httpResponse: HttpResponse =
+            httpClient.patch("$url/${oppdaterOppgaveRequest.id}") {
+                contentType(ContentType.Application.Json)
+                val token = accessTokenClient.getAccessToken(scope)
+                header("Authorization", "Bearer $token")
+                header("X-Correlation-ID", sporingsId)
+                setBody(oppdaterOppgaveRequest)
+            }
         if (httpResponse.status != HttpStatusCode.OK) {
-            log.error("Noe gikk galt ved oppdatering av oppgave for sporingsId $sporingsId: ${httpResponse.status}, ${httpResponse.body<String>()}")
-            throw RuntimeException("Noe gikk galt ved oppdatering av oppgave, responskode ${httpResponse.status}")
+            log.error(
+                "Noe gikk galt ved oppdatering av oppgave for sporingsId $sporingsId: ${httpResponse.status}, ${httpResponse.body<String>()}"
+            )
+            throw RuntimeException(
+                "Noe gikk galt ved oppdatering av oppgave, responskode ${httpResponse.status}"
+            )
         }
     }
 }

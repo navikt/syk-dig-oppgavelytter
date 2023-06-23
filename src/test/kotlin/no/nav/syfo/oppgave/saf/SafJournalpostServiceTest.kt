@@ -15,74 +15,112 @@ import no.nav.syfo.oppgave.saf.model.DokumentMedTittel
 import org.amshove.kluent.internal.assertFailsWith
 import org.amshove.kluent.shouldBeEqualTo
 
-class SafJournalpostServiceTest : FunSpec({
-    val safGraphQlClient = mockk<SafGraphQlClient>()
-    val accessTokenClient = mockk<AccessTokenClient>()
+class SafJournalpostServiceTest :
+    FunSpec({
+        val safGraphQlClient = mockk<SafGraphQlClient>()
+        val accessTokenClient = mockk<AccessTokenClient>()
 
-    val safJournalpostService = SafJournalpostService(safGraphQlClient, accessTokenClient, "scope")
+        val safJournalpostService =
+            SafJournalpostService(safGraphQlClient, accessTokenClient, "scope")
 
-    beforeEach {
-        clearMocks(safGraphQlClient, accessTokenClient)
-        coEvery { accessTokenClient.getAccessToken(any()) } returns "token"
-    }
-
-    context("SafJournalpostService") {
-        test("Finner dokumentInfoId for PDF") {
-            coEvery { safGraphQlClient.findJournalpost(any(), any(), any()) } returns FindJournalpostResponse(
-                ResponseData(
-                    JournalpostResponse(
-                        dokumenter = listOf(
-                            DokumentInfo("123", "tittel", "S055", listOf(Dokumentvariant("ARKIV"))),
-                            DokumentInfo("456", "tittel", null, listOf(Dokumentvariant("ORIGINAL"))),
-                        ),
-                        journalstatus = "MOTTATT",
-                        kanal = "ESSI",
-                    ),
-                ),
-                emptyList(),
-            )
-
-            val dokumentInfoId = safJournalpostService.getDokumenter("jpId", "sporing", "rina")
-
-            dokumentInfoId shouldBeEqualTo listOf(DokumentMedTittel("123", "tittel"))
+        beforeEach {
+            clearMocks(safGraphQlClient, accessTokenClient)
+            coEvery { accessTokenClient.getAccessToken(any()) } returns "token"
         }
-        test("Returnerer null hvis journalposten er journalført allerede") {
-            coEvery { safGraphQlClient.findJournalpost(any(), any(), any()) } returns FindJournalpostResponse(
-                ResponseData(
-                    JournalpostResponse(
-                        dokumenter = listOf(
-                            DokumentInfo("123", "tittel", "S055", listOf(Dokumentvariant("ARKIV"))),
-                            DokumentInfo("456", "tittel", null, listOf(Dokumentvariant("ORIGINAL"))),
+
+        context("SafJournalpostService") {
+            test("Finner dokumentInfoId for PDF") {
+                coEvery { safGraphQlClient.findJournalpost(any(), any(), any()) } returns
+                    FindJournalpostResponse(
+                        ResponseData(
+                            JournalpostResponse(
+                                dokumenter =
+                                    listOf(
+                                        DokumentInfo(
+                                            "123",
+                                            "tittel",
+                                            "S055",
+                                            listOf(Dokumentvariant("ARKIV"))
+                                        ),
+                                        DokumentInfo(
+                                            "456",
+                                            "tittel",
+                                            null,
+                                            listOf(Dokumentvariant("ORIGINAL"))
+                                        ),
+                                    ),
+                                journalstatus = "MOTTATT",
+                                kanal = "ESSI",
+                            ),
                         ),
-                        journalstatus = "FERDIGSTILT",
-                        kanal = "ESSI",
-                    ),
-                ),
-                emptyList(),
-            )
+                        emptyList(),
+                    )
 
-            val dokumentInfoId = safJournalpostService.getDokumenter("jpId", "sporing", "rina")
+                val dokumentInfoId = safJournalpostService.getDokumenter("jpId", "sporing", "rina")
 
-            dokumentInfoId shouldBeEqualTo null
-        }
-        test("Kaster feil hvis dokumentliste ikke inneholder PDF") {
-            coEvery { safGraphQlClient.findJournalpost(any(), any(), any()) } returns FindJournalpostResponse(
-                ResponseData(
-                    JournalpostResponse(
-                        dokumenter = listOf(
-                            DokumentInfo("123", "tittel", "S055", listOf(Dokumentvariant("SLADDET"))),
-                            DokumentInfo("456", "tittel", null, listOf(Dokumentvariant("ORIGINAL"))),
+                dokumentInfoId shouldBeEqualTo listOf(DokumentMedTittel("123", "tittel"))
+            }
+            test("Returnerer null hvis journalposten er journalført allerede") {
+                coEvery { safGraphQlClient.findJournalpost(any(), any(), any()) } returns
+                    FindJournalpostResponse(
+                        ResponseData(
+                            JournalpostResponse(
+                                dokumenter =
+                                    listOf(
+                                        DokumentInfo(
+                                            "123",
+                                            "tittel",
+                                            "S055",
+                                            listOf(Dokumentvariant("ARKIV"))
+                                        ),
+                                        DokumentInfo(
+                                            "456",
+                                            "tittel",
+                                            null,
+                                            listOf(Dokumentvariant("ORIGINAL"))
+                                        ),
+                                    ),
+                                journalstatus = "FERDIGSTILT",
+                                kanal = "ESSI",
+                            ),
                         ),
-                        journalstatus = "MOTTATT",
-                        kanal = "ESSI",
-                    ),
-                ),
-                emptyList(),
-            )
+                        emptyList(),
+                    )
 
-            assertFailsWith<RuntimeException> {
-                safJournalpostService.getDokumenter("jpId", "sporing", "rina")
+                val dokumentInfoId = safJournalpostService.getDokumenter("jpId", "sporing", "rina")
+
+                dokumentInfoId shouldBeEqualTo null
+            }
+            test("Kaster feil hvis dokumentliste ikke inneholder PDF") {
+                coEvery { safGraphQlClient.findJournalpost(any(), any(), any()) } returns
+                    FindJournalpostResponse(
+                        ResponseData(
+                            JournalpostResponse(
+                                dokumenter =
+                                    listOf(
+                                        DokumentInfo(
+                                            "123",
+                                            "tittel",
+                                            "S055",
+                                            listOf(Dokumentvariant("SLADDET"))
+                                        ),
+                                        DokumentInfo(
+                                            "456",
+                                            "tittel",
+                                            null,
+                                            listOf(Dokumentvariant("ORIGINAL"))
+                                        ),
+                                    ),
+                                journalstatus = "MOTTATT",
+                                kanal = "ESSI",
+                            ),
+                        ),
+                        emptyList(),
+                    )
+
+                assertFailsWith<RuntimeException> {
+                    safJournalpostService.getDokumenter("jpId", "sporing", "rina")
+                }
             }
         }
-    }
-})
+    })

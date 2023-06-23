@@ -12,13 +12,15 @@ class SykDigProducer(
 ) {
     fun send(sporingsId: String, digitaliseringsoppgave: DigitaliseringsoppgaveKafka) {
         try {
-            kafkaProducer.send(
-                ProducerRecord(
-                    topicName,
-                    sporingsId,
-                    digitaliseringsoppgave,
-                ),
-            ).get()
+            kafkaProducer
+                .send(
+                    ProducerRecord(
+                        topicName,
+                        sporingsId,
+                        digitaliseringsoppgave,
+                    ),
+                )
+                .get()
         } catch (ex: Exception) {
             securelog.error(
                 "Noe gikk galt ved skriving av digitaliseringsoppgave til kafka for oppgave ${objectMapper.writeValueAsString(digitaliseringsoppgave)} med sporingsId $sporingsId",

@@ -1,5 +1,6 @@
 package no.nav.syfo.oppgave.kafka
 
+import java.time.Duration
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -9,7 +10,6 @@ import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.log
 import no.nav.syfo.oppgave.OppgaveService
 import org.apache.kafka.clients.consumer.KafkaConsumer
-import java.time.Duration
 
 class OppgaveConsumer(
     private val oppgaveTopic: String,
@@ -28,7 +28,9 @@ class OppgaveConsumer(
                 } catch (ex: Exception) {
                     log.error("error running oppgave-consumer", ex)
                     kafkaConsumer.unsubscribe()
-                    log.info("Unsubscribed from topic $oppgaveTopic and waiting for 10 seconds before trying again")
+                    log.info(
+                        "Unsubscribed from topic $oppgaveTopic and waiting for 10 seconds before trying again"
+                    )
                     delay(10_000)
                 }
             }
@@ -39,15 +41,22 @@ class OppgaveConsumer(
         while (applicationState.ready) {
             val records = kafkaConsumer.poll(Duration.ofSeconds(1)).mapNotNull { it.value() }
             if (records.isNotEmpty()) {
-                records.filter {
-                    it.hendelse.hendelsestype == Hendelsestype.OPPGAVE_OPPRETTET &&
-                        (it.oppgave.kategorisering.tema == "SYM" || it.oppgave.kategorisering.tema == "SYK") && it.oppgave.kategorisering.behandlingstype == "ae0106" &&
-                        it.oppgave.kategorisering.oppgavetype == "JFR" && it.oppgave.bruker != null &&
-                        it.oppgave.bruker.identType == IdentType.FOLKEREGISTERIDENT
-                }.forEach {
-                        oppgaveKafkaAivenRecord ->
-                    oppgaveService.handleOppgave(oppgaveKafkaAivenRecord.oppgave.oppgaveId, oppgaveKafkaAivenRecord.oppgave.bruker!!.ident)
-                }
+                records
+                    .filter {
+                        it.hendelse.hendelsestype == Hendelsestype.OPPGAVE_OPPRETTET &&
+                            (it.oppgave.kategorisering.tema == "SYM" ||
+                                it.oppgave.kategorisering.tema == "SYK") &&
+                            it.oppgave.kategorisering.behandlingstype == "ae0106" &&
+                            it.oppgave.kategorisering.oppgavetype == "JFR" &&
+                            it.oppgave.bruker != null &&
+                            it.oppgave.bruker.identType == IdentType.FOLKEREGISTERIDENT
+                    }
+                    .forEach { oppgaveKafkaAivenRecord ->
+                        oppgaveService.handleOppgave(
+                            oppgaveKafkaAivenRecord.oppgave.oppgaveId,
+                            oppgaveKafkaAivenRecord.oppgave.bruker!!.ident
+                        )
+                    }
             }
         }
     }
