@@ -6,7 +6,7 @@ import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpHeaders
-import no.nav.syfo.log
+import no.nav.syfo.logger
 import no.nav.syfo.oppgave.saf.client.model.FindJournalpostRequest
 import no.nav.syfo.oppgave.saf.client.model.FindJournalpostResponse
 import no.nav.syfo.oppgave.saf.client.model.FindJournalpostVariables
@@ -36,7 +36,7 @@ class SafGraphQlClient(
                 }
                 .body()
         } catch (e: Exception) {
-            log.error(
+            logger.error(
                 "Noe gikk galt ved kall til SAF, journalpostId $journalpostId, sporingsId $sporingsId",
                 e
             )

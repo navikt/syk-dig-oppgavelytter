@@ -1,7 +1,7 @@
 package no.nav.syfo.oppgave.saf
 
 import no.nav.syfo.accesstoken.AccessTokenClient
-import no.nav.syfo.log
+import no.nav.syfo.logger
 import no.nav.syfo.oppgave.saf.client.SafGraphQlClient
 import no.nav.syfo.oppgave.saf.client.model.DokumentInfo
 import no.nav.syfo.oppgave.saf.client.model.JournalpostResponse
@@ -24,12 +24,12 @@ class SafJournalpostService(
                 sporingsId = sporingsId,
             )
         journalpost.errors?.forEach {
-            log.error(
+            logger.error(
                 "Feil ved henting av journalpost med id $journalpostId fra SAF: ${it.message}"
             )
         }
         if (journalpost.data == null) {
-            log.error(
+            logger.error(
                 "Mottatt journalføringsoppgave for journalpost som ikke finnes: journalpostId: $journalpostId, $sporingsId"
             )
             throw RuntimeException("Mottatt journalføringsoppgave for journalpost som ikke finnes")
@@ -37,12 +37,12 @@ class SafJournalpostService(
 
         journalpost.data.journalpost?.let {
             if (it.kanal != "EESSI" && source == "rina") {
-                log.warn(
+                logger.warn(
                     "Journalpost med id $journalpostId har ikke forventet mottakskanal: ${it.kanal}, $sporingsId"
                 )
             }
             if (it.dokumenter?.any { it.brevkode == "S055" } == false && source == "rina") {
-                log.warn(
+                logger.warn(
                     "Journalpost med id $journalpostId har ingen dokumenter med forventet brevkode, $sporingsId"
                 )
             }
@@ -50,13 +50,13 @@ class SafJournalpostService(
             if (erIkkeJournalfort(it)) {
                 return finnDokumentInfoIdForSykmeldingPdfListe(it.dokumenter, sporingsId)
             } else {
-                log.warn(
+                logger.warn(
                     "Journalpost med id $journalpostId er allerede journalført, sporingsId $sporingsId"
                 )
                 return null
             }
         }
-        log.warn("Fant ikke journalpost med id $journalpostId, $sporingsId")
+        logger.warn("Fant ikke journalpost med id $journalpostId, $sporingsId")
         return null
     }
 
@@ -79,7 +79,7 @@ class SafJournalpostService(
                 ?.map { DokumentMedTittel(it.dokumentInfoId, it.tittel) }
 
         if (dokumenter.isNullOrEmpty()) {
-            log.error("Fant ikke PDF-dokument for sykmelding, $sporingsId")
+            logger.error("Fant ikke PDF-dokument for sykmelding, $sporingsId")
             throw RuntimeException("Journalpost mangler PDF, $sporingsId")
         }
 

@@ -11,7 +11,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import no.nav.syfo.accesstoken.AccessTokenClient
-import no.nav.syfo.log
+import no.nav.syfo.logger
 
 class OppgaveClient(
     private val url: String,
@@ -29,7 +29,7 @@ class OppgaveClient(
                 }
                 .body<OppgaveResponse>()
         } catch (e: Exception) {
-            log.error(
+            logger.error(
                 "Noe gikk galt ved henting av oppgave med id $oppgaveId, sporingsId $sporingsId",
                 e
             )
@@ -50,7 +50,7 @@ class OppgaveClient(
                 setBody(oppdaterOppgaveRequest)
             }
         if (httpResponse.status != HttpStatusCode.OK) {
-            log.error(
+            logger.error(
                 "Noe gikk galt ved oppdatering av oppgave for sporingsId $sporingsId: ${httpResponse.status}, ${httpResponse.body<String>()}"
             )
             throw RuntimeException(

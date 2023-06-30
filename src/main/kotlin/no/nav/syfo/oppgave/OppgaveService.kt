@@ -1,7 +1,7 @@
 package no.nav.syfo.oppgave
 
 import java.util.UUID
-import no.nav.syfo.log
+import no.nav.syfo.logger
 import no.nav.syfo.oppgave.client.OppdaterOppgaveRequest
 import no.nav.syfo.oppgave.client.OppgaveClient
 import no.nav.syfo.oppgave.client.OppgaveResponse
@@ -26,7 +26,7 @@ class OppgaveService(
                 oppgave.gjelderUtenlandskSykmeldingVurderHenvendelseOppgave()) &&
                 !oppgave.journalpostId.isNullOrEmpty()
         ) {
-            log.info(
+            logger.info(
                 "VURD_HENV eller BEH_SED utenlandsk sykmelding: OppgaveId $oppgaveId, journalpostId ${oppgave.journalpostId}"
             )
         }
@@ -36,11 +36,11 @@ class OppgaveService(
                 oppgave.gjelderUtenlandskSykmeldingFraNAVNO()) &&
                 !oppgave.journalpostId.isNullOrEmpty()
         ) {
-            log.info(
+            logger.info(
                 "Oppgave med id $oppgaveId og journalpostId ${oppgave.journalpostId} gjelder utenlandsk sykmelding, sporingsId $sporingsId"
             )
 
-            log.info(
+            logger.info(
                 "Utenlandsk sykmelding: OppgaveId $oppgaveId, journalpostId ${oppgave.journalpostId}"
             )
             if (oppgave.erTildeltNavOppfolgningUtlang() || cluster == "dev-gcp") {
@@ -71,14 +71,14 @@ class OppgaveService(
                             source = setSoruce(oppgave),
                         ),
                     )
-                    log.info(
+                    logger.info(
                         "Sendt sykmelding til syk-dig for oppgaveId $oppgaveId, sporingsId $sporingsId"
                     )
                 } else {
-                    log.warn("Oppgaven $oppgaveId har ikke dokumenter, hopper over")
+                    logger.warn("Oppgaven $oppgaveId har ikke dokumenter, hopper over")
                 }
             } else {
-                log.warn("Oppgaven $oppgaveId er ikke tildelt $NAV_OPPFOLGNING_UTLAND")
+                logger.warn("Oppgaven $oppgaveId er ikke tildelt $NAV_OPPFOLGNING_UTLAND")
             }
         }
     }

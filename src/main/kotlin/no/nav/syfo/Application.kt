@@ -5,23 +5,29 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import io.ktor.client.HttpClient
-import io.ktor.client.HttpClientConfig
-import io.ktor.client.engine.apache.Apache
-import io.ktor.client.engine.apache.ApacheEngineConfig
-import io.ktor.client.plugins.HttpResponseValidator
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.serialization.jackson.jackson
+import io.ktor.client.*
+import io.ktor.client.engine.apache.*
+import io.ktor.client.plugins.*
+import io.ktor.http.*
+import io.ktor.serialization.jackson.*
+import io.ktor.server.application.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.statuspages.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import io.prometheus.client.hotspot.DefaultExports
 import java.net.SocketTimeoutException
+import java.util.concurrent.TimeUnit
 import no.nav.syfo.accesstoken.AccessTokenClient
-import no.nav.syfo.application.ApplicationServer
-import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.application.createApplicationEngine
-import no.nav.syfo.application.exception.ServiceUnavailableException
 import no.nav.syfo.kafka.aiven.KafkaUtils
 import no.nav.syfo.kafka.toConsumerConfig
 import no.nav.syfo.kafka.toProducerConfig
+import no.nav.syfo.metrics.monitorHttpRequests
+import no.nav.syfo.nais.isalive.naisIsAliveRoute
+import no.nav.syfo.nais.isready.naisIsReadyRoute
+import no.nav.syfo.nais.prometheus.naisPrometheusRoute
 import no.nav.syfo.oppgave.OppgaveService
 import no.nav.syfo.oppgave.client.OppgaveClient
 import no.nav.syfo.oppgave.kafka.OppgaveConsumer
@@ -39,7 +45,7 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-val log: Logger = LoggerFactory.getLogger("no.nav.syfo.syk-dig-oppgavelytter")
+val logger: Logger = LoggerFactory.getLogger("no.nav.syfo.syk-dig-oppgavelytter")
 val securelog: Logger = LoggerFactory.getLogger("securelog")
 
 val objectMapper: ObjectMapper =
@@ -51,19 +57,67 @@ val objectMapper: ObjectMapper =
     }
 
 fun main() {
-    val env = Environment()
-
-    DefaultExports.initialize()
-    val applicationState = ApplicationState()
-    val applicationEngine =
-        createApplicationEngine(
-            env,
-            applicationState,
+    val embeddedServer =
+        embeddedServer(
+            Netty,
+            port = EnvironmentVariables().applicationPort,
+            module = Application::module,
         )
-    val applicationServer = ApplicationServer(applicationEngine, applicationState)
+    Runtime.getRuntime()
+        .addShutdownHook(
+            Thread {
+                embeddedServer.stop(TimeUnit.SECONDS.toMillis(10), TimeUnit.SECONDS.toMillis(10))
+            },
+        )
+    embeddedServer.start(true)
+}
+
+fun Application.configureRouting(
+    applicationState: ApplicationState,
+) {
+
+    routing {
+        naisIsAliveRoute(applicationState)
+        naisIsReadyRoute(applicationState)
+        naisPrometheusRoute()
+    }
+
+    install(ContentNegotiation) {
+        jackson {
+            registerKotlinModule()
+            registerModule(JavaTimeModule())
+            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        }
+    }
+
+    install(StatusPages) {
+        exception<Throwable> { call, cause ->
+            logger.error("Caught exception ${cause.message}")
+            securelog.error("Caught exception", cause)
+            call.respond(HttpStatusCode.InternalServerError, cause.message ?: "Unknown error")
+            applicationState.alive = false
+            applicationState.ready = false
+        }
+    }
+
+    intercept(ApplicationCallPipeline.Monitoring, monitorHttpRequests())
+}
+
+fun Application.module() {
+    val environmentVariables = EnvironmentVariables()
+    val applicationState = ApplicationState()
+
+    environment.monitor.subscribe(ApplicationStopped) {
+        applicationState.ready = false
+        applicationState.alive = false
+    }
+
+    configureRouting(
+        applicationState = applicationState,
+    )
 
     val config: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
-        install(ContentNegotiation) {
+        install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
             jackson {
                 registerKotlinModule()
                 registerModule(JavaTimeModule())
@@ -85,24 +139,24 @@ fun main() {
 
     val accessTokenClient =
         AccessTokenClient(
-            aadAccessTokenUrl = env.aadAccessTokenUrl,
-            clientId = env.clientId,
-            clientSecret = env.clientSecret,
+            aadAccessTokenUrl = environmentVariables.aadAccessTokenUrl,
+            clientId = environmentVariables.clientId,
+            clientSecret = environmentVariables.clientSecret,
             httpClient = httpClient,
         )
 
     val oppgaveClient =
         OppgaveClient(
-            url = env.oppgaveUrl,
+            url = environmentVariables.oppgaveUrl,
             accessTokenClient = accessTokenClient,
             httpClient = httpClient,
-            scope = env.oppgaveScope,
+            scope = environmentVariables.oppgaveScope,
         )
 
     val safGraphQlClient =
         SafGraphQlClient(
             httpClient = httpClient,
-            basePath = "${env.safUrl}/graphql",
+            basePath = "${environmentVariables.safUrl}/graphql",
             graphQlQuery =
                 SafGraphQlClient::class
                     .java
@@ -114,7 +168,7 @@ fun main() {
         SafJournalpostService(
             safGraphQlClient = safGraphQlClient,
             accessTokenClient = accessTokenClient,
-            scope = env.safScope,
+            scope = environmentVariables.safScope,
         )
 
     val sykDigProducer =
@@ -122,25 +176,36 @@ fun main() {
             KafkaProducer<String, DigitaliseringsoppgaveKafka>(
                 KafkaUtils.getAivenKafkaConfig()
                     .toProducerConfig(
-                        env.applicationName,
-                        valueSerializer = JacksonKafkaSerializer::class
+                        environmentVariables.applicationName,
+                        valueSerializer = JacksonKafkaSerializer::class,
                     ),
             ),
-            env.sykDigTopic,
+            environmentVariables.sykDigTopic,
         )
 
     val oppgaveConsumer =
         OppgaveConsumer(
-            oppgaveTopic = env.oppgaveTopic,
+            oppgaveTopic = environmentVariables.oppgaveTopic,
             kafkaConsumer = getKafkaConsumer(),
             oppgaveService =
-                OppgaveService(oppgaveClient, safJournalpostService, sykDigProducer, env.cluster),
+                OppgaveService(
+                    oppgaveClient,
+                    safJournalpostService,
+                    sykDigProducer,
+                    environmentVariables.cluster,
+                ),
             applicationState = applicationState,
         )
+
     oppgaveConsumer.startConsumer()
 
-    applicationServer.start()
+    DefaultExports.initialize()
 }
+
+data class ApplicationState(
+    var alive: Boolean = true,
+    var ready: Boolean = true,
+)
 
 private fun getKafkaConsumer(): KafkaConsumer<String, OppgaveKafkaAivenRecord> {
     val kafkaConsumer =
@@ -152,10 +217,12 @@ private fun getKafkaConsumer(): KafkaConsumer<String, OppgaveKafkaAivenRecord> {
                 }
                 .toConsumerConfig(
                     "syk-dig-oppgavelytter-consumer",
-                    JacksonKafkaDeserializer::class
+                    JacksonKafkaDeserializer::class,
                 ),
             StringDeserializer(),
             JacksonKafkaDeserializer(OppgaveKafkaAivenRecord::class),
         )
     return kafkaConsumer
 }
+
+class ServiceUnavailableException(message: String?) : Exception(message)

@@ -5,31 +5,30 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 group = "no.nav.syfo"
 version = "1.0.0"
 
-val coroutinesVersion = "1.7.1"
-val jacksonVersion = "2.15.2"
-val kluentVersion = "1.73"
-val ktorVersion = "2.3.2"
-val logbackVersion = "1.4.8"
-val logstashEncoderVersion = "7.4"
-val prometheusVersion = "0.16.0"
-val smCommonVersion = "1.0.9"
-val mockkVersion = "1.13.5"
-val testContainerKafkaVersion = "1.18.3"
-val kotlinVersion = "1.8.22"
-val kotestVersion = "5.6.2"
-val postgresVersion = "42.6.0"
-val hikariVersion = "5.0.1"
-val googlePostgresVersion = "1.12.0"
-val flywayVersion = "9.20.0"
-val testContainerVersion = "1.18.3"
-val ktfmtVersion = "0.44"
+val coroutinesVersion: String by project
+val jacksonVersion: String by project
+val kluentVersion: String by project
+val ktorVersion: String by project
+val logbackVersion: String by project
+val logstashEncoderVersion: String by project
+val prometheusVersion: String by project
+val smCommonVersion: String by project
+val mockkVersion: String by project
+val kotlinVersion: String by project
+val postgresVersion: String by project
+val hikariVersion: String by project
+val googlePostgresVersion: String by project
+val flywayVersion: String by project
+val ktfmtVersion: String by project
+val junitJupiterVersion: String by project
 
 tasks.withType<Jar> {
-    manifest.attributes["Main-Class"] = "no.nav.syfo.BootstrapKt"
+    manifest.attributes["Main-Class"] = "no.nav.syfo.ApplicationKt"
 }
 
 plugins {
     kotlin("jvm") version "1.8.22"
+    id("io.ktor.plugin") version "2.3.2"
     id("com.diffplug.spotless") version "6.19.0"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("org.cyclonedx.bom") version "1.7.4"
@@ -37,6 +36,13 @@ plugins {
 
 val githubUser: String by project
 val githubPassword: String by project
+
+application {
+    mainClass.set("no.nav.syfo.ApplicationKt")
+
+    val isDevelopment: Boolean = project.ext.has("development")
+    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+}
 
 repositories {
     mavenCentral()
@@ -83,15 +89,13 @@ dependencies {
 
     testImplementation("org.amshove.kluent:kluent:$kluentVersion") 
     testImplementation("io.mockk:mockk:$mockkVersion")
-    testImplementation("org.testcontainers:kafka:$testContainerKafkaVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion") {
         exclude(group = "org.eclipse.jetty") 
     }
-    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
-    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
-    testImplementation("io.kotest:kotest-property:$kotestVersion")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
+
     testImplementation("org.flywaydb:flyway-core:$flywayVersion")
-    testImplementation("org.testcontainers:postgresql:$testContainerVersion")
 }
 
 tasks {

@@ -6,8 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.log
+import no.nav.syfo.logger
 import no.nav.syfo.oppgave.OppgaveService
 import org.apache.kafka.clients.consumer.KafkaConsumer
 
@@ -15,7 +14,7 @@ class OppgaveConsumer(
     private val oppgaveTopic: String,
     private val kafkaConsumer: KafkaConsumer<String, OppgaveKafkaAivenRecord>,
     private val oppgaveService: OppgaveService,
-    private val applicationState: ApplicationState,
+    private val applicationState: no.nav.syfo.ApplicationState,
 ) {
 
     @OptIn(DelicateCoroutinesApi::class)
@@ -26,9 +25,9 @@ class OppgaveConsumer(
                     kafkaConsumer.subscribe(listOf(oppgaveTopic))
                     consume()
                 } catch (ex: Exception) {
-                    log.error("error running oppgave-consumer", ex)
+                    logger.error("error running oppgave-consumer", ex)
                     kafkaConsumer.unsubscribe()
-                    log.info(
+                    logger.info(
                         "Unsubscribed from topic $oppgaveTopic and waiting for 10 seconds before trying again"
                     )
                     delay(10_000)
