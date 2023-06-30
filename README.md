@@ -5,7 +5,7 @@ This project contains the application code and infrastructure for syk-dig-oppgav
 * Kotlin
 * Ktor
 * Gradle
-* Kotest
+* Junit
 
 #### Requirements
 * JDK 17
@@ -13,7 +13,8 @@ This project contains the application code and infrastructure for syk-dig-oppgav
 
 ## Getting started
 ### Getting github-package-registry packages NAV-IT
-Some packages used in this repo is uploaded to the GitHub Package Registry which requires authentication. It can, for example, be solved like this in Gradle:
+Some packages used in this repo is uploaded to the GitHub Package Registry which requires authentication.
+It can, for example, be solved like this in Gradle:
 ```
 val githubUser: String by project
 val githubPassword: String by project
@@ -59,16 +60,6 @@ To build locally and run the integration tests you can simply run
 or  on windows 
 `gradlew.bat shadowJar`
 
-#### Creating a docker image
-Creating a docker image should be as simple as 
-``` bash 
-docker build -t syk-dig-oppgavelytter .
-```
-
-#### Running a docker image
-``` bash 
-docker run --rm -it -p 8080:8080 syk-dig-oppgavelytter
-```
 
 ### Upgrading the gradle wrapper
 Find the newest version of gradle here: https://gradle.org/releases/ Then run this command:
@@ -80,7 +71,7 @@ Find the newest version of gradle here: https://gradle.org/releases/ Then run th
 
 This project is maintained by [navikt/teamsykmelding](CODEOWNERS)
 
-Questions and/or feature requests? Please create an [issue](https://github.com/navikt/syk-dig-oppgavelytter/issues).
+Questions and/or feature requests? Please create an [issue](https://github.com/navikt/syk-dig-oppgavelytter/issues)
 
 If you work in [@navikt](https://github.com/navikt) you can reach us at the Slack
-channel [#team-sykmelding](https://nav-it.slack.com/archives/CMA3XV997).
+channel [#team-sykmelding](https://nav-it.slack.com/archives/CMA3XV997)

@@ -155,11 +155,11 @@ fun Application.module() {
             httpClient = httpClient,
             basePath = "${environmentVariables.safUrl}/graphql",
             graphQlQuery =
-            SafGraphQlClient::class
-                .java
-                .getResource("/graphql/findJournalpost.graphql")!!
-                .readText()
-                .replace(Regex("[\n\t]"), ""),
+                SafGraphQlClient::class
+                    .java
+                    .getResource("/graphql/findJournalpost.graphql")!!
+                    .readText()
+                    .replace(Regex("[\n\t]"), ""),
         )
     val safJournalpostService =
         SafJournalpostService(
@@ -185,12 +185,12 @@ fun Application.module() {
             oppgaveTopic = environmentVariables.oppgaveTopic,
             kafkaConsumer = getKafkaConsumer(),
             oppgaveService =
-            OppgaveService(
-                oppgaveClient,
-                safJournalpostService,
-                sykDigProducer,
-                environmentVariables.cluster,
-            ),
+                OppgaveService(
+                    oppgaveClient,
+                    safJournalpostService,
+                    sykDigProducer,
+                    environmentVariables.cluster,
+                ),
             applicationState = applicationState,
         )
 
