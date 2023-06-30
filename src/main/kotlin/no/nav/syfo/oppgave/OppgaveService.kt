@@ -21,6 +21,15 @@ class OppgaveService(
         val sporingsId = UUID.randomUUID().toString()
         val oppgave = oppgaveClient.hentOppgave(oppgaveId = oppgaveId, sporingsId = sporingsId)
 
+        if ((oppgave.gjelderUtenlandskSykmeldingBehandleSedOppgave() || oppgave.gjelderUtenlandskSykmeldingVurderHenvendelseOppgave())
+            &&
+            !oppgave.journalpostId.isNullOrEmpty())
+        {
+            log.info(
+                "VURD_HENV eller BEH_SED utenlandsk sykmelding: OppgaveId $oppgaveId, journalpostId ${oppgave.journalpostId}"
+            )
+        }
+
         if (
             (oppgave.gjelderUtenlandskSykmeldingFraRina() ||
                 oppgave.gjelderUtenlandskSykmeldingFraNAVNO()) &&
@@ -90,6 +99,24 @@ class OppgaveService(
             behandlingstype == "ae0106" &&
             behandlingstema.isNullOrEmpty() &&
             oppgavetype == "JFR"
+    }
+
+    private fun OppgaveResponse.gjelderUtenlandskSykmeldingBehandleSedOppgave(): Boolean {
+        return ferdigstiltTidspunkt.isNullOrEmpty() &&
+            behandlesAvApplikasjon == null &&
+            tema == "SYM" &&
+            behandlingstype == "ae0106" &&
+            behandlingstema.isNullOrEmpty() &&
+            oppgavetype == "BEH_SED"
+    }
+
+    private fun OppgaveResponse.gjelderUtenlandskSykmeldingVurderHenvendelseOppgave(): Boolean {
+        return ferdigstiltTidspunkt.isNullOrEmpty() &&
+            behandlesAvApplikasjon == null &&
+            tema == "SYM" &&
+            behandlingstype == "ae0106" &&
+            behandlingstema.isNullOrEmpty() &&
+            oppgavetype == "VURD_HENV"
     }
 
     private fun setSoruce(oppgave: OppgaveResponse): String {
