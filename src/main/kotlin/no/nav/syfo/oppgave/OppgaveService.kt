@@ -21,10 +21,11 @@ class OppgaveService(
         val sporingsId = UUID.randomUUID().toString()
         val oppgave = oppgaveClient.hentOppgave(oppgaveId = oppgaveId, sporingsId = sporingsId)
 
-        if ((oppgave.gjelderUtenlandskSykmeldingBehandleSedOppgave() || oppgave.gjelderUtenlandskSykmeldingVurderHenvendelseOppgave())
-            &&
-            !oppgave.journalpostId.isNullOrEmpty())
-        {
+        if (
+            (oppgave.gjelderUtenlandskSykmeldingBehandleSedOppgave() ||
+                oppgave.gjelderUtenlandskSykmeldingVurderHenvendelseOppgave()) &&
+                !oppgave.journalpostId.isNullOrEmpty()
+        ) {
             log.info(
                 "VURD_HENV eller BEH_SED utenlandsk sykmelding: OppgaveId $oppgaveId, journalpostId ${oppgave.journalpostId}"
             )
