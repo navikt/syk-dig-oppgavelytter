@@ -24,7 +24,6 @@ import no.nav.syfo.accesstoken.AccessTokenClient
 import no.nav.syfo.kafka.aiven.KafkaUtils
 import no.nav.syfo.kafka.toConsumerConfig
 import no.nav.syfo.kafka.toProducerConfig
-import no.nav.syfo.metrics.monitorHttpRequests
 import no.nav.syfo.nais.isalive.naisIsAliveRoute
 import no.nav.syfo.nais.isready.naisIsReadyRoute
 import no.nav.syfo.nais.prometheus.naisPrometheusRoute
@@ -99,8 +98,6 @@ fun Application.configureRouting(
             applicationState.ready = false
         }
     }
-
-    intercept(ApplicationCallPipeline.Monitoring, monitorHttpRequests())
 }
 
 fun Application.module() {
@@ -158,11 +155,11 @@ fun Application.module() {
             httpClient = httpClient,
             basePath = "${environmentVariables.safUrl}/graphql",
             graphQlQuery =
-                SafGraphQlClient::class
-                    .java
-                    .getResource("/graphql/findJournalpost.graphql")!!
-                    .readText()
-                    .replace(Regex("[\n\t]"), ""),
+            SafGraphQlClient::class
+                .java
+                .getResource("/graphql/findJournalpost.graphql")!!
+                .readText()
+                .replace(Regex("[\n\t]"), ""),
         )
     val safJournalpostService =
         SafJournalpostService(
@@ -188,12 +185,12 @@ fun Application.module() {
             oppgaveTopic = environmentVariables.oppgaveTopic,
             kafkaConsumer = getKafkaConsumer(),
             oppgaveService =
-                OppgaveService(
-                    oppgaveClient,
-                    safJournalpostService,
-                    sykDigProducer,
-                    environmentVariables.cluster,
-                ),
+            OppgaveService(
+                oppgaveClient,
+                safJournalpostService,
+                sykDigProducer,
+                environmentVariables.cluster,
+            ),
             applicationState = applicationState,
         )
 
