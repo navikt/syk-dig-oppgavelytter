@@ -105,7 +105,7 @@ class OppgaveService(
     private fun OppgaveResponse.gjelderUtenlandskSykmeldingBehandleSedOppgave(): Boolean {
         return ferdigstiltTidspunkt.isNullOrEmpty() &&
             behandlesAvApplikasjon == null &&
-            tema == "SYM" &&
+            (tema == "SYM" || tema == "SYK") &&
             behandlingstype == "ae0106" &&
             behandlingstema.isNullOrEmpty() &&
             oppgavetype == "BEH_SED"
@@ -114,7 +114,7 @@ class OppgaveService(
     private fun OppgaveResponse.gjelderUtenlandskSykmeldingVurderHenvendelseOppgave(): Boolean {
         return ferdigstiltTidspunkt.isNullOrEmpty() &&
             behandlesAvApplikasjon == null &&
-            tema == "SYM" &&
+            (tema == "SYM" || tema == "SYK") &&
             behandlingstype == "ae0106" &&
             behandlingstema.isNullOrEmpty() &&
             oppgavetype == "VURD_HENV"
