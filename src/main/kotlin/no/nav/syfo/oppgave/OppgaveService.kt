@@ -106,7 +106,7 @@ class OppgaveService(
         return ferdigstiltTidspunkt.isNullOrEmpty() &&
             behandlesAvApplikasjon == null &&
             (tema == "SYM" || tema == "SYK") &&
-            behandlingstype == "ae0106" &&
+            /* behandlingstype == "ae0106" && */
             behandlingstema.isNullOrEmpty() &&
             oppgavetype == "BEH_SED"
     }
@@ -115,7 +115,7 @@ class OppgaveService(
         return ferdigstiltTidspunkt.isNullOrEmpty() &&
             behandlesAvApplikasjon == null &&
             (tema == "SYM" || tema == "SYK") &&
-            behandlingstype == "ae0106" &&
+            /* behandlingstype == "ae0106" && */
             behandlingstema.isNullOrEmpty() &&
             oppgavetype == "VURD_HENV"
     }
