@@ -78,7 +78,9 @@ class OppgaveService(
                     logger.warn("Oppgaven $oppgaveId har ikke dokumenter, hopper over")
                 }
             } else {
-                logger.warn("Oppgaven $oppgaveId, journalpostId ${oppgave.journalpostId} er ikke tildelt $NAV_OPPFOLGNING_UTLAND")
+                logger.warn(
+                    "Oppgaven $oppgaveId, journalpostId ${oppgave.journalpostId} er ikke tildelt $NAV_OPPFOLGNING_UTLAND"
+                )
             }
         }
     }
