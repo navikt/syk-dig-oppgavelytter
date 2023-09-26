@@ -72,13 +72,13 @@ class OppgaveService(
                         ),
                     )
                     logger.info(
-                        "Sendt sykmelding til syk-dig for oppgaveId $oppgaveId, sporingsId $sporingsId"
+                        "Sendt sykmelding til syk-dig for oppgaveId $oppgaveId, sporingsId $sporingsId, journalpostId ${oppgave.journalpostId}"
                     )
                 } else {
                     logger.warn("Oppgaven $oppgaveId har ikke dokumenter, hopper over")
                 }
             } else {
-                logger.warn("Oppgaven $oppgaveId er ikke tildelt $NAV_OPPFOLGNING_UTLAND")
+                logger.warn("Oppgaven $oppgaveId, journalpostId ${oppgave.journalpostId} er ikke tildelt $NAV_OPPFOLGNING_UTLAND")
             }
         }
     }
