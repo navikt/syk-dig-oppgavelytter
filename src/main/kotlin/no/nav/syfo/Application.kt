@@ -171,7 +171,7 @@ fun Application.module() {
     val sykDigProducer =
         SykDigProducer(
             KafkaProducer<String, DigitaliseringsoppgaveKafka>(
-                KafkaUtils.getAivenKafkaConfig()
+                KafkaUtils.getAivenKafkaConfig("syk-dig-producer")
                     .toProducerConfig(
                         environmentVariables.applicationName,
                         valueSerializer = JacksonKafkaSerializer::class,
@@ -207,7 +207,7 @@ data class ApplicationState(
 private fun getKafkaConsumer(): KafkaConsumer<String, OppgaveKafkaAivenRecord> {
     val kafkaConsumer =
         KafkaConsumer(
-            KafkaUtils.getAivenKafkaConfig()
+            KafkaUtils.getAivenKafkaConfig("oppgave-consumer")
                 .also {
                     it[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "none"
                     it[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = 50
