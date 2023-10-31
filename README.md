@@ -11,6 +11,21 @@ This project contains the application code and infrastructure for syk-dig-oppgav
 * JDK 17
 * Docker
 
+## FlowChart
+This the high level flow of the application
+> **Note**
+> the flowchart is manually updated
+> 
+```mermaid
+  graph LR
+      oppgave ---> id1([oppgavehandtering.oppgavehendelse-v1])
+      id1([oppgavehandtering.oppgavehendelse-v1]) ---> syk-dig-oppgavelytter
+      syk-dig-oppgavelytter --- syk-dig-backend
+      syk-dig-oppgavelytter --- saf
+      syk-dig-oppgavelytter <---> oppgave
+      syk-dig-oppgavelytter --- azure_ad
+```
+
 ## Getting started
 ### Building the application
 #### Compile and package application
