@@ -8,20 +8,20 @@ val ktorVersion = "2.3.5"
 val logbackVersion = "1.4.11"
 val logstashEncoderVersion = "7.4"
 val prometheusVersion = "0.16.0"
-val smCommonVersion = "2.0.4"
+val smCommonVersion = "2.1.0-jdk"
 val mockkVersion = "1.13.8"
-val kotlinVersion = "1.9.10"
+val kotlinVersion = "1.9.20"
 val postgresVersion = "42.6.0"
-val hikariVersion = "5.0.1"
+val hikariVersion = "5.1.0"
 val googlePostgresVersion = "1.14.1"
-val flywayVersion = "9.22.3"
+val flywayVersion = "10.0.0"
 val ktfmtVersion = "0.44"
-val junitJupiterVersion = "5.10.0"
+val junitJupiterVersion = "5.10.1"
 
 
 plugins {
     id("application")
-    kotlin("jvm") version "1.9.10"
+    kotlin("jvm") version "1.9.20"
     id("com.diffplug.spotless") version "6.22.0"
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
