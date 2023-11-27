@@ -23,7 +23,7 @@ val commonsCodecVersion="1.16.0"
 plugins {
     id("application")
     kotlin("jvm") version "1.9.20"
-    id("com.diffplug.spotless") version "6.22.0"
+    id("com.diffplug.spotless") version "6.23.0"
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
