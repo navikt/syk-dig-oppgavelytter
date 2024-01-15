@@ -9,12 +9,12 @@ val logbackVersion = "1.4.14"
 val logstashEncoderVersion = "7.4"
 val prometheusVersion = "0.16.0"
 val smCommonVersion = "2.0.8"
-val mockkVersion = "1.13.8"
+val mockkVersion = "1.13.9"
 val kotlinVersion = "1.9.22"
 val postgresVersion = "42.7.1"
 val hikariVersion = "5.1.0"
 val googlePostgresVersion = "1.15.1"
-val flywayVersion = "10.4.1"
+val flywayVersion = "10.5.0"
 val ktfmtVersion = "0.44"
 val junitJupiterVersion = "5.10.1"
 val commonsCodecVersion="1.16.0"
@@ -23,7 +23,7 @@ val commonsCodecVersion="1.16.0"
 plugins {
     id("application")
     kotlin("jvm") version "1.9.22"
-    id("com.diffplug.spotless") version "6.23.3"
+    id("com.diffplug.spotless") version "6.24.0"
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
