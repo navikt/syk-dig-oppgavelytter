@@ -1,5 +1,7 @@
 package no.nav.syfo.oppgave
 
+import io.opentelemetry.instrumentation.annotations.SpanAttribute
+import io.opentelemetry.instrumentation.annotations.WithSpan
 import java.util.UUID
 import no.nav.syfo.logger
 import no.nav.syfo.oppgave.client.OppdaterOppgaveRequest
@@ -17,28 +19,33 @@ class OppgaveService(
     private val sykDigProducer: SykDigProducer,
     private val cluster: String,
 ) {
-    suspend fun handleOppgave(oppgaveId: Long, fnr: String) {
+
+    @WithSpan
+    suspend fun handleOppgave(
+        @SpanAttribute
+        oppgaveId: Long, fnr: String
+    ) {
         val sporingsId = UUID.randomUUID().toString()
         val oppgave = oppgaveClient.hentOppgave(oppgaveId = oppgaveId, sporingsId = sporingsId)
 
         if (
             (oppgave.gjelderUtenlandskSykmeldingFraRina() ||
                 oppgave.gjelderUtenlandskSykmeldingFraNAVNO()) &&
-                !oppgave.journalpostId.isNullOrEmpty()
+            !oppgave.journalpostId.isNullOrEmpty()
         ) {
             logger.info(
-                "Oppgave med id $oppgaveId og journalpostId ${oppgave.journalpostId} gjelder utenlandsk sykmelding, sporingsId $sporingsId"
+                    "Oppgave med id $oppgaveId og journalpostId ${oppgave.journalpostId} gjelder utenlandsk sykmelding, sporingsId $sporingsId",
             )
 
             logger.info(
-                "Utenlandsk sykmelding: OppgaveId $oppgaveId, journalpostId ${oppgave.journalpostId}"
+                    "Utenlandsk sykmelding: OppgaveId $oppgaveId, journalpostId ${oppgave.journalpostId}",
             )
             if (oppgave.erTildeltNavOppfolgningUtlang() || cluster == "dev-gcp") {
                 val dokumenter =
                     safJournalpostService.getDokumenter(
-                        journalpostId = oppgave.journalpostId,
-                        sporingsId = sporingsId,
-                        source = setSoruce(oppgave)
+                            journalpostId = oppgave.journalpostId,
+                            sporingsId = sporingsId,
+                            source = setSoruce(oppgave),
                     )
                 if (dokumenter != null) {
                     oppgaveClient.oppdaterOppgave(
@@ -62,14 +69,14 @@ class OppgaveService(
                         ),
                     )
                     logger.info(
-                        "Sendt sykmelding til syk-dig for oppgaveId $oppgaveId, sporingsId $sporingsId, journalpostId ${oppgave.journalpostId}"
+                            "Sendt sykmelding til syk-dig for oppgaveId $oppgaveId, sporingsId $sporingsId, journalpostId ${oppgave.journalpostId}",
                     )
                 } else {
                     logger.warn("Oppgaven $oppgaveId har ikke dokumenter, hopper over")
                 }
             } else {
                 logger.warn(
-                    "Oppgaven $oppgaveId, journalpostId ${oppgave.journalpostId} er ikke tildelt $NAV_OPPFOLGNING_UTLAND"
+                        "Oppgaven $oppgaveId, journalpostId ${oppgave.journalpostId} er ikke tildelt $NAV_OPPFOLGNING_UTLAND",
                 )
             }
         }
