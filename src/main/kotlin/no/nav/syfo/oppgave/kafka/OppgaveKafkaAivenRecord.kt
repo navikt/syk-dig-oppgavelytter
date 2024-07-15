@@ -34,7 +34,7 @@ data class Kategorisering(
 
 data class Hendelse(
     val hendelsestype: Hendelsestype,
-    val tidspunkt: LocalDateTime,
+    val tidspunkt: LocalDateTime?,
 )
 
 enum class Hendelsestype {
