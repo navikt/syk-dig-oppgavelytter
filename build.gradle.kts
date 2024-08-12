@@ -8,7 +8,6 @@ val ktorVersion = "2.3.11"
 val logbackVersion = "1.5.6"
 val logstashEncoderVersion = "7.4"
 val prometheusVersion = "0.16.0"
-val smCommonVersion = "2.0.8"
 val mockkVersion = "1.13.10"
 val kotlinVersion = "1.9.24"
 val postgresVersion = "42.7.3"
@@ -19,6 +18,9 @@ val ktfmtVersion = "0.44"
 val junitJupiterVersion = "5.10.2"
 val commonsCodecVersion="1.17.0"
 val opentelemetryVersion = "2.3.0"
+val kafkaVersion = "3.8.0"
+val snappyJavaVersion = "1.1.10.6"
+
 
 plugins {
     id("application")
@@ -71,12 +73,13 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
-    implementation("no.nav.helse:syfosm-common-kafka:$smCommonVersion")
+    implementation("org.apache.kafka:kafka_2.12:$kafkaVersion")
     constraints {
-        implementation("org.xerial.snappy:snappy-java:1.1.10.5") {
+        implementation("org.xerial.snappy:snappy-java:$snappyJavaVersion") {
             because("override transient from org.apache.kafka:kafka_2.12")
         }
     }
+
 
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.postgresql:postgresql:$postgresVersion")
