@@ -11,7 +11,8 @@ class SykDigProducer(
     private val topicName: String,
 ) {
     fun send(sporingsId: String, digitaliseringsoppgave: DigitaliseringsoppgaveKafka) {
-        try {
+        logger.info("Slått av syk-dig-oppgavelytter")
+        /*try {
             kafkaProducer
                 .send(
                     ProducerRecord(
@@ -31,6 +32,6 @@ class SykDigProducer(
                 ex.message,
             )
             throw ex
-        }
+        }*/
     }
 }
