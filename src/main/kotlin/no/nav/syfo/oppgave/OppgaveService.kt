@@ -22,61 +22,7 @@ class OppgaveService(
 
     @WithSpan
     suspend fun handleOppgave(@SpanAttribute oppgaveId: Long, fnr: String) {
-        val sporingsId = UUID.randomUUID().toString()
-        val oppgave = oppgaveClient.hentOppgave(oppgaveId = oppgaveId, sporingsId = sporingsId)
-
-        if (
-            (oppgave.gjelderUtenlandskSykmeldingFraRina() ||
-                oppgave.gjelderUtenlandskSykmeldingFraNAVNO()) &&
-                !oppgave.journalpostId.isNullOrEmpty()
-        ) {
-            logger.info(
-                "Oppgave med id $oppgaveId og journalpostId ${oppgave.journalpostId} gjelder utenlandsk sykmelding, sporingsId $sporingsId",
-            )
-
-            logger.info(
-                "Utenlandsk sykmelding: OppgaveId $oppgaveId, journalpostId ${oppgave.journalpostId}",
-            )
-            if (oppgave.erTildeltNavOppfolgningUtlang() || cluster == "dev-gcp") {
-                val dokumenter =
-                    safJournalpostService.getDokumenter(
-                        journalpostId = oppgave.journalpostId,
-                        sporingsId = sporingsId,
-                        source = setSoruce(oppgave),
-                    )
-                if (dokumenter != null) {
-                    oppgaveClient.oppdaterOppgave(
-                        OppdaterOppgaveRequest(
-                            id = oppgaveId.toInt(),
-                            behandlesAvApplikasjon = "SMD",
-                            versjon = oppgave.versjon,
-                        ),
-                        sporingsId,
-                    )
-                    sykDigProducer.send(
-                        sporingsId,
-                        DigitaliseringsoppgaveKafka(
-                            oppgaveId = oppgaveId.toString(),
-                            fnr = fnr,
-                            journalpostId = oppgave.journalpostId,
-                            dokumentInfoId = dokumenter.first().dokumentInfoId,
-                            type = "UTLAND",
-                            dokumenter = dokumenter,
-                            source = setSoruce(oppgave),
-                        ),
-                    )
-                    logger.info(
-                        "Sendt sykmelding til syk-dig for oppgaveId $oppgaveId, sporingsId $sporingsId, journalpostId ${oppgave.journalpostId}",
-                    )
-                } else {
-                    logger.warn("Oppgaven $oppgaveId har ikke dokumenter, hopper over")
-                }
-            } else {
-                logger.warn(
-                    "Oppgaven $oppgaveId, journalpostId ${oppgave.journalpostId} er ikke tildelt $NAV_OPPFOLGNING_UTLAND",
-                )
-            }
-        }
+        logger.info("Slått av handleOppgave syk-dig-oppgavelytter")
     }
 
     private fun OppgaveResponse.gjelderUtenlandskSykmeldingFraRina(): Boolean {
