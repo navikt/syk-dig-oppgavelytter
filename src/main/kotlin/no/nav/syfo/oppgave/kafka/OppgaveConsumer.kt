@@ -39,6 +39,7 @@ class OppgaveConsumer(
     private suspend fun consume() {
         while (applicationState.ready) {
             val records = kafkaConsumer.poll(Duration.ofSeconds(1)).mapNotNull { it.value() }
+            logger.info("Fetching new message from Kafka")
             if (records.isNotEmpty()) {
                 records
                     .filter {
