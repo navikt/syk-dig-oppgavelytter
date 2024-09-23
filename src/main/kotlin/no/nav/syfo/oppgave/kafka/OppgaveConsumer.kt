@@ -1,11 +1,6 @@
 package no.nav.syfo.oppgave.kafka
 
 import java.time.Duration
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import no.nav.syfo.logger
 import no.nav.syfo.oppgave.OppgaveService
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -17,23 +12,8 @@ class OppgaveConsumer(
     private val applicationState: no.nav.syfo.ApplicationState,
 ) {
 
-    @OptIn(DelicateCoroutinesApi::class)
     fun startConsumer() {
-        GlobalScope.launch(Dispatchers.IO) {
-            while (applicationState.ready) {
-                try {
-                    kafkaConsumer.subscribe(listOf(oppgaveTopic))
-                    consume()
-                } catch (ex: Exception) {
-                    logger.error("error running oppgave-consumer", ex)
-                    kafkaConsumer.unsubscribe()
-                    logger.info(
-                        "Unsubscribed from topic $oppgaveTopic and waiting for 10 seconds before trying again"
-                    )
-                    delay(10_000)
-                }
-            }
-        }
+        logger.info("Oppaveconsumer turned off")
     }
 
     private suspend fun consume() {
