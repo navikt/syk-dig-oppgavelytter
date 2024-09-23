@@ -1,11 +1,6 @@
 package no.nav.syfo.oppgave.kafka
 
 import java.time.Duration
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import no.nav.syfo.logger
 import no.nav.syfo.oppgave.OppgaveService
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -16,7 +11,7 @@ class OppgaveConsumer(
     private val oppgaveService: OppgaveService,
     private val applicationState: no.nav.syfo.ApplicationState,
 ) {
-    
+
     fun startConsumer() {
         logger.info("Oppaveconsumer turned off")
     }
