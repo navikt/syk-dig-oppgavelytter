@@ -1,3 +1,5 @@
+> [!WARNING]  
+> Moved program logic to https://github.com/navikt/syk-dig-backend
 # syk-dig-oppgavelytter
 This project contains the application code and infrastructure for syk-dig-oppgavelytter
 
